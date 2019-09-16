@@ -1,5 +1,9 @@
 ;;; Programming env packages
 
+(use-package yaml-mode
+  :mode (("\\.yml$" . yaml-mode)
+	 ("\\.yaml$" . yaml-mode)))
+
 (use-package magit
   :bind (("C-x g" . magit-status)))
 

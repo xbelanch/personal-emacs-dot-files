@@ -1,3 +1,10 @@
+;; Org mode
+
+(setq-default org-display-custom-times t)
+;;; Before you ask: No, removing the <> here doesn't work.
+(setq org-time-stamp-custom-formats
+      '("<%d %b %Y>" . "<%d/%m/%y %a %H:%M>"))
+
 ;; Weather Forecast
 
 ;; Sunshine

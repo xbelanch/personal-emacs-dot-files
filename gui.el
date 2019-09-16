@@ -34,7 +34,7 @@
 ;;; Set the font
 (set-face-attribute 'default nil :font "Iosevka" :height 120)
 
-(setq line-width-characters 77)
+(setq line-width-characters 90)
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
 (setq inhibit-startup-screen t)

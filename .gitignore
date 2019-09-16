@@ -39,3 +39,4 @@ GRTAGS
 .bookmarks.el
 *~
 .smex*
+misc/*
