@@ -1,6 +1,12 @@
-;; Writing settings for Markdown and Fountain
+;; Writing settings for Markdown, Fountain...
 ;;; Need to see how it will work Pandoc... Paru and other stuff
 
+
+;;; This doesnt work to me... give it a chance!?
+;;; Source: https://github.com/zonuexe/emacs-copyit
+(use-package copyit-pandoc :ensure t)
+
+;;; Super markdown-mode
 (use-package markdown-mode
     :init
     :config
