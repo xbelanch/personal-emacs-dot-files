@@ -1,9 +1,38 @@
+;; Calendar custom catalan localization
+
+(setq
+    calendar-week-start-day 1
+    ;; calendar-day-name-array ["diumenge" "dilluns" "dimarts" "dimecres" "dijous" "divendres" "dissabte"]
+    calendar-day-name-array ["dg" "dll" "dm" "dx" "dj" "dv" "ds"]
+    calendar-month-name-array ["gener" "febrer" "març" "abril" "maig" "juny" "juliol" "agost" "setembre" "octubre" "novembre" "desembre"]
+   )
+
+
 ;; Org mode
 
-(setq-default org-display-custom-times t)
+(use-package org
+  :ensure t
+  :mode ("\\.org\\'" . org-mode)
+  :bind (("C-c l" . org-store-link)
+         ("C-c c" . org-capture)
+         ("C-c a" . org-agenda)
+         ("C-c b" . org-iswitchb)
+         ("C-c C-w" . org-refile)
+         ("C-c j" . org-clock-goto)
+         ("C-c C-x C-o" . org-clock-out))
+  :config
+  (setq-default org-display-custom-times t)
 ;;; Before you ask: No, removing the <> here doesn't work.
-(setq org-time-stamp-custom-formats
+  (setq org-time-stamp-custom-formats
       '("<%d %b %Y>" . "<%d/%m/%y %a %H:%M>"))
+  (setq org-clock-persist t)
+  (org-clock-persistence-insinuate)
+  (setq org-time-clocksum-format '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t)))
+
+(use-package org-bullets
+  :ensure t
+  :commands (org-bullets-mode)
+  :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 ;; Weather Forecast
 

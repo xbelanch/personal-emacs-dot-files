@@ -6,6 +6,16 @@
 ;;; Source: https://github.com/zonuexe/emacs-copyit
 (use-package copyit-pandoc :ensure t)
 
+;;; Pandoc mode
+;;; source: http://joostkremers.github.io/pandoc-mode/
+(use-package pandoc-mode
+  :config
+  ;; can't deal with windows pandoc :?
+  ;; (setq pandoc-binary "/cygdrive/c/Program Files/Pandoc/pandoc.exe")
+  (add-hook 'markdown-mode-hook 'pandoc-mode)
+  ;; (add-hook 'org-mode-hook 'pandoc-mode)
+  (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings))
+
 ;;; Super markdown-mode
 (use-package markdown-mode
     :init

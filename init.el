@@ -39,7 +39,7 @@
 (bind-key "C-c <up>" 'windmove-up)
 (bind-key "C-c <down>" 'windmove-down)
 (bind-key "C-q" 'kill-buffer)
-(bind-key "M-q" 'query-replace)
+(bind-key "M-q" 'query-replace-regexp)
 (bind-key "s-<" 'beginning-of-buffer)
 (bind-key "s->" 'end-of-buffer)
 (bind-key "C-c C-w" 'fill-paragraph)
@@ -85,7 +85,7 @@
  '(font-lock-maximum-decoration (quote ((fountain-mode) (t . t))))
  '(package-selected-packages
    (quote
-    (copyit-pandoc yaml-mode duplicate-thing move-text fountain-mode olivetti pdf-tools forecast sunshine beacon smart-mode-line smart-mode-line-powerline-theme treemacs ace-window nyan-mode ggtags ctags-update smart-comment avy smex golden-ratio diminish markdown-mode markdown-toc company alert magit undo-tree counsel swiper dracula-theme use-package))))
+    (org org-beautify-theme org-bullets pandoc-mode copyit-pandoc yaml-mode duplicate-thing move-text fountain-mode olivetti pdf-tools forecast sunshine beacon smart-mode-line smart-mode-line-powerline-theme treemacs ace-window nyan-mode ggtags ctags-update smart-comment avy smex golden-ratio diminish markdown-mode markdown-toc company alert magit undo-tree counsel swiper dracula-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
