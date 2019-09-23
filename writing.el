@@ -1,5 +1,8 @@
 ;; Writing settings for Markdown, Fountain...
-;;; Need to see how it will work Pandoc... Paru and other stuff
+
+;;; Need to write a simple pandoc call or better to pandocomatic instead
+;;; pandoc-mode :-(
+;;; Time to learn a bit of elisp?
 
 ;;; Super markdown-mode
 (use-package markdown-mode
