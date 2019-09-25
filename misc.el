@@ -1,3 +1,10 @@
+;; View Large Files
+
+(use-package vlf
+  :ensure t
+  :config (progn
+            (require 'vlf-setup)))
+
 ;; Calendar custom catalan localization
 
 (setq

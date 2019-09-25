@@ -85,7 +85,7 @@
  '(font-lock-maximum-decoration (quote ((fountain-mode) (t . t))))
  '(package-selected-packages
    (quote
-    (org org-beautify-theme org-bullets yaml-mode duplicate-thing move-text fountain-mode olivetti pdf-tools forecast sunshine beacon smart-mode-line smart-mode-line-powerline-theme treemacs ace-window nyan-mode ggtags ctags-update smart-comment avy smex golden-ratio diminish markdown-mode markdown-toc company alert magit undo-tree counsel swiper dracula-theme use-package))))
+    (vlf org org-beautify-theme org-bullets yaml-mode duplicate-thing move-text fountain-mode olivetti pdf-tools forecast sunshine beacon smart-mode-line smart-mode-line-powerline-theme treemacs ace-window nyan-mode ggtags ctags-update smart-comment avy smex golden-ratio diminish markdown-mode markdown-toc company alert magit undo-tree counsel swiper dracula-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
