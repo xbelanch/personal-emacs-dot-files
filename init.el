@@ -6,11 +6,11 @@
 ;;--------------------------------------------------------------------------
 (package-initialize)
 (add-to-list 'package-archives
-	     '("melpa" . "http://melpa.milkbox.net/packages/"))
+	     '("melpa" . "https://melpa.milkbox.net/packages/"))
 (add-to-list 'package-archives
-	     '("melpa-stable" . "http://stable.melpa.org/packages/"))
+	     '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (add-to-list 'package-archives
-	     '("org" . "http://orgmode.org/elpa/"))
+	     '("org" . "https://orgmode.org/elpa/"))
 
 ;;----------------------------------------------------------------------------
 ;; Use package ;) THAT'S SO IMPORTANT!
