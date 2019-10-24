@@ -1,4 +1,5 @@
 .cache/*
+*.cache
 .python-environments/*
 auto-save-list/*
 bookmarks
@@ -7,6 +8,7 @@ eshell/*
 projectile-bookmarks.eld
 recentf
 smex-items
+amx-items
 tramp
 url/*
 #*.*#
@@ -40,3 +42,4 @@ GRTAGS
 *~
 .smex*
 misc/*
+server/
