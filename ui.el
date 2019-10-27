@@ -5,6 +5,7 @@
       (toggle-scroll-bar 0)
       (tool-bar-mode 0)
       (menu-bar-mode 0)
+      (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
       (setq use-default-font-for-symbols nil)
       (setq inhibit-compacting-font-caches t)
@@ -19,28 +20,31 @@
 ;; TODO: https://github.com/blue0513/point-history
 ;; (use-package point-history)
 
-
 (use-package dashboard
-  :diminish
+    :diminish
   (dashboard-mode page-break-lines-mode)
-  :custom
-  (dashboard-center-content t)
-  ;; Set the title
-  (dashboard-banner-logo-title "Welcome to Free Belanche Foundation")
-  (dashboard-footer "Emacs is pretty cool!")
-  (dashboard-footer-icon (all-the-icons-octicon "dashboard"
+  :preface
+  (defun my/dashboard-banner ()
+    "Set a dashboard banner including information on package initialization
+  time and garbage collections."""
+    (setq dashboard-banner-logo-title
+          (format "Emacs ready in %.2f seconds with %d garbage collections."
+                  (float-time (time-subtract after-init-time before-init-time)) gcs-done))
+    (setq dashboard-footer "Free Belanche Foundation")
+    (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
                                                    :height 1.1
                                                    :v-adjust -0.05
-                                                   :face 'font-lock-keyword-face))
-  ;; Set the banner 
-  (dashboard-startup-banner "./mriocbot.png") ;; find 1.txt or whatever 
-  (dashboard-items '((recents . 15)
+                                                   :face 'font-lock-keyword-face)))
+
+  :config
+  (setq dashboard-startup-banner (concat user-emacs-directory "mriocbot.png"))
+  (dashboard-setup-startup-hook)
+  :custom
+  (dashboard-items '((recents . 10)
                      (projects . 5)
                      (bookmarks . 5)))
-  :custom-face
-  (dashboard-heading ((t (:foreground "#f1fa8c" :weight bold))))
-  :hook
-  (after-init . dashboard-setup-startup-hook))
+  :hook ((after-init     . dashboard-refresh-buffer)
+         (dashboard-mode . my/dashboard-banner)))
 
 
 ;; Change cursor style
@@ -66,55 +70,6 @@
   :custom
   (imenu-list-focus-after-activation t)
   (imenu-list-auto-resize t))
-
-(use-package neotree
-  :after
-  projectile
-  :commands
-  (neotree-show neotree-hide neotree-dir neotree-find)
-  :custom
-  ;; (neo-theme 'nerd2)
-  (neo-theme 'icons)
-  :bind
-  ("<f8>" . neotree-current-dir-toggle)
-  ("<f9>" . neotree-projectile-toggle)
-  :preface
-  (defun neotree-projectile-toggle ()
-    (interactive)
-    (let ((project-dir
-           (ignore-errors
-           ;;; Pick one: projectile or find-file-in-project
-             (projectile-project-root)
-             ))
-          (file-name (buffer-file-name))
-          (neo-smart-open t))
-      (if (and (fboundp 'neo-global--window-exists-p)
-               (neo-global--window-exists-p))
-          (neotree-hide)
-        (progn
-          (neotree-show)
-          (if project-dir
-              (neotree-dir project-dir))
-          (if file-name
-              (neotree-find file-name))))))
-  (defun neotree-current-dir-toggle ()
-    (interactive)
-    (let ((project-dir
-           (ignore-errors
-             (ffip-project-root)
-             ))
-          (file-name (buffer-file-name))
-          (neo-smart-open t))
-      (if (and (fboundp 'neo-global--window-exists-p)
-               (neo-global--window-exists-p))
-          (neotree-hide)
-        (progn
-          (neotree-show)
-          (if project-dir
-              (neotree-dir project-dir))
-          (if file-name
-              (neotree-find file-name)))))))
-
 
 (use-package doom-themes
   :custom
@@ -168,7 +123,6 @@
   (dimmer-exclusion-regexp-list
        '(".*Minibuf.*"
          ".*which-key.*"
-         ".*NeoTree.*"
          ".*Messages.*"
          ".*Async.*"
          ".*Warnings.*"

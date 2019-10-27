@@ -13,7 +13,8 @@
 (bind-key "s-<" 'beginning-of-buffer)
 (bind-key "s->" 'end-of-buffer)
 (bind-key "C-c C-w" 'fill-paragraph)
-
+(bind-key "C-x o" 'ace-window)
+(bind-key "C-c o" 'ace-select-window)
 (use-package which-key
   :diminish which-key-mode
   :hook (after-init . which-key-mode))

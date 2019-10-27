@@ -16,7 +16,7 @@
 (setq buffer-file-coding-system 'utf-8) ; utf-8-unix
 (setq save-buffer-coding-system 'utf-8) ; nil
 (setq process-coding-system-alist
-  (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
+      (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
 
 ;; Quiet Startup
 (setq inhibit-startup-screen t)
@@ -78,6 +78,7 @@
 (use-package recentf
   :ensure nil
   :hook (after-init . recentf-mode)
+  :bind(("C-c r" . counsel-recentf))
   :custom
   (recentf-max-saved-items 20000000)
   (recentf-auto-cleanup 'never)
@@ -132,3 +133,16 @@
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
 
+;;; Move paragraphs or text like Sublime Text
+(unless (package-installed-p 'move-text)
+  (package-refresh-contents)
+  (package-install 'move-text))
+
+
+(use-package move-text
+  :bind
+  ("M-<down>" . move-text-down)
+  ("M-<up>" . move-text-up))
+
+(use-package duplicate-thing
+  :bind ("M-c" . duplicate-thing))

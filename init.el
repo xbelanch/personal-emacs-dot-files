@@ -39,7 +39,7 @@
 ;;;---------------------------------------------------------------------------
 (when (file-exists-p "~/.emacs.d/keybindings.el")
   (load "~/.emacs.d/keybindings.el"))
-
+        
 ;;;----------------------------------------------------------------------------
 ;;; Setting completion functions
 ;;;---------------------------------------------------------------------------
@@ -80,20 +80,25 @@
 ;;; Setting counsel-ivy options and related stuff
 ;;;---------------------------------------------------------------------------
 (when (file-exists-p "~/.emacs.d/ivy.el")
- (load "~/.emacs.d/ivy.el"))
+  (load "~/.emacs.d/ivy.el"))
 
 ;;;----------------------------------------------------------------------------
 ;;; Setting up weather and forescast info
 ;;;---------------------------------------------------------------------------
-(when (file-exists-p "~/.emacs.d/weather.el")
- (load "~/.emacs.d/weather.el"))
+;; (when (file-exists-p "~/.emacs.d/weather.el")
+;;   (load "~/.emacs.d/weather.el"))
 
 ;;;----------------------------------------------------------------------------
 ;;; Setting up pdf-tools
 ;;;---------------------------------------------------------------------------
 (when (file-exists-p "~/.emacs.d/pdf-tools.el")
- (load "~/.emacs.d/pdf-tools.el"))
+  (load "~/.emacs.d/pdf-tools.el"))
 
+;;;----------------------------------------------------------------------------
+;;; Setting up treemacs
+;;;---------------------------------------------------------------------------
+(when (file-exists-p "~/.emacs.d/treemacs.el")
+  (load "~/.emacs.d/treemacs.el"))
 
 
 (custom-set-variables
@@ -132,6 +137,7 @@
  '(doom-themes-enable-bold t)
  '(doom-themes-enable-italic t)
  '(enable-recursive-minibuffers t)
+ '(font-lock-maximum-decoration (quote ((fountain-mode) (t . t))))
  '(google-translate-default-source-language "en" t)
  '(google-translate-default-target-language "ca" t)
  '(highlight-indent-guides-auto-enabled t)
@@ -156,13 +162,13 @@
  '(nyan-cat-face-number 4)
  '(package-selected-packages
    (quote
-    (sotlisp solar forecast sunshine all-the-icons-ivy yaml-mode systemd logview markdown-toc markdown-mode js2-mode google-this google-translate github-pullrequest browse-at-remote gitignore-mode gitconfig-mode gitattributes-mode magit diffview git-timemachine company-quickhelp company-box company-posframe company mwim ivy-rich ivy-posframe counsel-projectile amx flx counsel wgrep-ag anzu ag wgrep projectile undo-tree hydra-posframe hydra which-key point-history popwin posframe all-the-icons smartparens hungry-delete bind-key quelpa diminish use-package)))
- '(recentf-auto-cleanup (quote never))
+    (treemacs-magit treemacs-icons-dired treemacs-projectile treemacs sotlisp solar sunshine all-the-icons-ivy yaml-mode systemd logview markdown-toc markdown-mode js2-mode google-this google-translate github-pullrequest browse-at-remote gitignore-mode gitconfig-mode gitattributes-mode magit diffview git-timemachine company-quickhelp company-box company-posframe company mwim ivy-rich ivy-posframe counsel-projectile amx flx counsel wgrep-ag anzu ag wgrep projectile undo-tree hydra-posframe hydra which-key point-history popwin posframe all-the-icons smartparens hungry-delete bind-key quelpa diminish use-package)))
+ '(recentf-auto-cleanup (quote never) t)
  '(recentf-exclude
    (quote
     ((expand-file-name package-user-dir)
-     ".cache" "cache" "recentf" "COMMIT_EDITMSG\\'")))
- '(recentf-max-saved-items 20000000)
+     ".cache" "cache" "recentf" "COMMIT_EDITMSG\\'")) t)
+ '(recentf-max-saved-items 20000000 t)
  '(show-paren-style (quote mixed))
  '(show-paren-when-point-in-periphery t)
  '(show-paren-when-point-inside-paren t)
