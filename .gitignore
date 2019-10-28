@@ -36,6 +36,9 @@ elpa-25.2/
 GPATH
 GTAGS
 TAGS
+TAGS.*
+*.data
+*clock*.*
 GRTAGS
 .cask/
 .bookmarks.el

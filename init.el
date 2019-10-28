@@ -1,5 +1,12 @@
 ;; load path and set packages sources
 
+;; If package-check-signature is allow-unsigned, don't
+;; signal error when we can't verify signature because of
+;; missing public key.  Other errors are still treated as
+;; fatal (bug#17625).
+;; font: https://emacs.stackexchange.com/questions/233/how-to-proceed-on-package-el-signature-check-failure
+(setq package-check-signature nil)
+
 (eval-when-compile
   (require 'package)
   (package-initialize)
@@ -18,6 +25,7 @@
   (setq use-package-expand-minimally t)
 
   (require 'use-package))
+
 
 (require 'diminish)
 (require 'bind-key)
