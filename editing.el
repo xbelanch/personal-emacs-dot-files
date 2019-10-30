@@ -138,11 +138,34 @@
   (package-refresh-contents)
   (package-install 'move-text))
 
-
 (use-package move-text
   :bind
   ("M-<down>" . move-text-down)
   ("M-<up>" . move-text-up))
 
 (use-package duplicate-thing
-  :bind ("M-c" . duplicate-thing))
+  :bind ("C-c C-d" . duplicate-thing))
+
+;;; Warnings, Alerts and other special keywords in comments
+;; from Casey Muratori
+(setq fixme-modes '(c-mode js2-mode yaml-mode sgml-mode fountain-mode markdown-mode))
+(make-face 'font-lock-fixme-face)
+(make-face 'font-lock-note-face)
+(make-face 'font-lock-done-face)
+(make-face 'font-lock-alert-face)
+(make-face 'font-lock-hack-face)
+(mapc (lambda (mode)
+        (font-lock-add-keywords
+         mode
+         '(("\\<\\(TODO\\):" 1 'font-lock-fixme-face t)
+           ("\\<\\(NOTE\\):" 1 'font-lock-note-face t)
+           ("\\<\\(HACK\\):" 1 'font-lock-alert-face t)
+           ("\\<\\(DONE\\):" 1 'font-lock-done-face t)
+           ("\\<\\(FIXME\\):" 1 'font-lock-hack-face t)
+	   ("\\<\\(ALERT\\):" 1 'font-lock-alert-face t))))
+      fixme-modes)
+(modify-face 'font-lock-fixme-face "magenta" nil nil t nil t nil nil)
+(modify-face 'font-lock-note-face "cyan" nil nil t nil t nil nil)
+(modify-face 'font-lock-done-face "green" nil nil t nil t nil nil)
+(modify-face 'font-lock-alert-face "OrangeRed" nil nil t nil t nil nil)
+(modify-face 'font-lock-hack-face "gold" nil nil t nil t nil nil)

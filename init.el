@@ -67,10 +67,16 @@
   (load "~/.emacs.d/google-tools.el"))
 
 ;;;----------------------------------------------------------------------------
-;;; Settings programming and markup languages options
+;;; Settings for markup languages
 ;;;---------------------------------------------------------------------------
 (when (file-exists-p "~/.emacs.d/languages.el")
   (load "~/.emacs.d/languages.el"))
+
+;;;----------------------------------------------------------------------------
+;;; Settings for programming options
+;;;---------------------------------------------------------------------------
+(when (file-exists-p "~/.emacs.d/programming.el")
+  (load "~/.emacs.d/programming.el"))
 
 ;;;----------------------------------------------------------------------------
 ;;; Settings custom functions
@@ -136,7 +142,7 @@
       display
       (raise -0.06)
       rear-nonsticky t)) t)
- '(dashboard-items (quote ((recents . 15) (projects . 5) (bookmarks . 5))) t)
+ '(dashboard-items (quote ((recents . 10) (projects . 5) (bookmarks . 5))) t)
  '(dashboard-startup-banner "./mriocbot.png" t)
  '(doom-modeline-buffer-file-name-style (quote truncate-with-project))
  '(doom-modeline-icon t)
@@ -170,13 +176,13 @@
  '(nyan-cat-face-number 4)
  '(package-selected-packages
    (quote
-    (treemacs-magit treemacs-icons-dired treemacs-projectile treemacs sotlisp solar sunshine all-the-icons-ivy yaml-mode systemd logview markdown-toc markdown-mode js2-mode google-this google-translate github-pullrequest browse-at-remote gitignore-mode gitconfig-mode gitattributes-mode magit diffview git-timemachine company-quickhelp company-box company-posframe company mwim ivy-rich ivy-posframe counsel-projectile amx flx counsel wgrep-ag anzu ag wgrep projectile undo-tree hydra-posframe hydra which-key point-history popwin posframe all-the-icons smartparens hungry-delete bind-key quelpa diminish use-package)))
- '(recentf-auto-cleanup (quote never) t)
+    (duplicate-thing ctags-update ggtags treemacs-magit treemacs-icons-dired treemacs-projectile treemacs sotlisp solar sunshine all-the-icons-ivy yaml-mode systemd logview markdown-toc markdown-mode js2-mode google-this google-translate github-pullrequest browse-at-remote gitignore-mode gitconfig-mode gitattributes-mode magit diffview git-timemachine company-quickhelp company-box company-posframe company mwim ivy-rich ivy-posframe counsel-projectile amx flx counsel wgrep-ag anzu ag wgrep projectile undo-tree hydra-posframe hydra which-key point-history popwin posframe all-the-icons smartparens hungry-delete bind-key quelpa diminish use-package)))
+ '(recentf-auto-cleanup (quote never))
  '(recentf-exclude
    (quote
     ((expand-file-name package-user-dir)
-     ".cache" "cache" "recentf" "COMMIT_EDITMSG\\'")) t)
- '(recentf-max-saved-items 20000000 t)
+     ".cache" "cache" "recentf" "COMMIT_EDITMSG\\'")))
+ '(recentf-max-saved-items 20000000)
  '(show-paren-style (quote mixed))
  '(show-paren-when-point-in-periphery t)
  '(show-paren-when-point-inside-paren t)
