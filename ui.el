@@ -9,7 +9,7 @@
 
       (setq use-default-font-for-symbols nil)
       (setq inhibit-compacting-font-caches t)
-      (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 120)))
+      (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 115))) 
 
 
 (use-package all-the-icons)

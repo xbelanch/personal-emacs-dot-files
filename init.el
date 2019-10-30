@@ -135,13 +135,12 @@
  '(dashboard-footer "Emacs is pretty cool!" t)
  '(dashboard-footer-icon
    #("" 0 1
-     (face
-      (:family "github-octicons" :height 1.32 :inherit font-lock-keyword-face)
-      font-lock-face
-      (:family "github-octicons" :height 1.32 :inherit font-lock-keyword-face)
-      display
-      (raise -0.06)
-      rear-nonsticky t)) t)
+     (rear-nonsticky t display
+                     (raise -0.06)
+                     font-lock-face
+                     (:family "github-octicons" :height 1.32 :inherit font-lock-keyword-face)
+                     face
+                     (:family "github-octicons" :height 1.32 :inherit font-lock-keyword-face))) t)
  '(dashboard-items (quote ((recents . 10) (projects . 5) (bookmarks . 5))) t)
  '(dashboard-startup-banner "./mriocbot.png" t)
  '(doom-modeline-buffer-file-name-style (quote truncate-with-project))
@@ -176,7 +175,7 @@
  '(nyan-cat-face-number 4)
  '(package-selected-packages
    (quote
-    (duplicate-thing ctags-update ggtags treemacs-magit treemacs-icons-dired treemacs-projectile treemacs sotlisp solar sunshine all-the-icons-ivy yaml-mode systemd logview markdown-toc markdown-mode js2-mode google-this google-translate github-pullrequest browse-at-remote gitignore-mode gitconfig-mode gitattributes-mode magit diffview git-timemachine company-quickhelp company-box company-posframe company mwim ivy-rich ivy-posframe counsel-projectile amx flx counsel wgrep-ag anzu ag wgrep projectile undo-tree hydra-posframe hydra which-key point-history popwin posframe all-the-icons smartparens hungry-delete bind-key quelpa diminish use-package)))
+    (duplicate-thing ggtags treemacs-magit treemacs-icons-dired treemacs-projectile treemacs sotlisp solar sunshine all-the-icons-ivy yaml-mode systemd logview markdown-toc markdown-mode js2-mode google-this google-translate github-pullrequest browse-at-remote gitignore-mode gitconfig-mode gitattributes-mode magit diffview git-timemachine company-quickhelp company-box company-posframe company mwim ivy-rich ivy-posframe counsel-projectile amx flx counsel wgrep-ag anzu ag wgrep projectile undo-tree hydra-posframe hydra which-key point-history popwin posframe all-the-icons smartparens hungry-delete bind-key quelpa diminish use-package)))
  '(recentf-auto-cleanup (quote never))
  '(recentf-exclude
    (quote

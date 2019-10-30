@@ -17,14 +17,6 @@
 
 (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
 
-
-;; With the fancy new ctags-update package, we can update the tags file whenever we save a file:
-(use-package ctags-update
-  :ensure t
-  :config
-  (add-hook 'prog-mode-hook  'turn-on-ctags-auto-update-mode)
-  :diminish ctags-auto-update-mode)
-
 ;;; ---------------------------------------------------------------------------
 ;;; Restore window configuration after working with gdb window panel
 ;;; Source: https://emacs.stackexchange.com/questions/26855/how-to-automatically-restore-the-previous-window-layout-after-gdb
