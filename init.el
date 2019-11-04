@@ -541,6 +541,12 @@
   :config
   (setq markdown-toc-header-toc-title "# Índex"))
 
+
+                                        ; === Pandoc copyit ===
+
+(use-package copyit :ensure t)
+(use-package copyit-pandoc :ensure t)
+
                                         ; === Olivetti ===
 
 (use-package olivetti
