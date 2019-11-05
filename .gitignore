@@ -1,3 +1,4 @@
+.#-emacs*
 .cache/*
 *.cache
 .python-environments/*
