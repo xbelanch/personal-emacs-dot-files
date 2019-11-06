@@ -35,14 +35,18 @@
 
                                         ; === Default init variables ===
 
-;; Global variables
 (setq line-width-characters 80)
-;; Default Encoding
+
+                                        ; ===  Default Encoding ===
+
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-selection-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
-(set-clipboard-coding-system 'utf-8) ; included by set-selection-coding-system
+;; NOTE: This has changed because of this: https://stackoverflow.com/questions/22647517/emacs-encoding-of-pasted-text
+;; Maybe it needs to check if you're working on windows or linux... 
+(set-clipboard-coding-system 'utf-16le-dos) ; why?
+; (set-clipboard-coding-system 'utf-8) ; included by set-selection-coding-system
 (set-keyboard-coding-system 'utf-8) ; configured by prefer-coding-system
 (set-terminal-coding-system 'utf-8) ; configured by prefer-coding-system
 (setq buffer-file-coding-system 'utf-8) ; utf-8-unix
@@ -50,7 +54,9 @@
 (setq process-coding-system-alist
       (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
 
-;; Quiet Startup
+
+
+                                        ;===  Quiet Startup ===
 (defun display-startup-echo-area-message ()
   (message ""))
 (setq inhibit-startup-screen t)
@@ -132,9 +138,10 @@
       (setq inhibit-compacting-font-caches t)))
 
                                         ; === Set font and size ==== ;
-
-(set-face-attribute 'default nil :family "PragmataPro")
-(set-face-attribute 'default nil :height 160)
+;; Pragmata Pro is for rich people
+;; Try the slender version ;)
+(set-face-attribute 'default nil :family "Iosevka Nerd Font")
+(set-face-attribute 'default nil :height 120)
 
 
 (use-package all-the-icons
