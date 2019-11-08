@@ -595,6 +595,38 @@
 
                                         ; === CUSTOM FUNCTIONS ===
 
+;;; (#2): Broken paragraphs (markdown files) 
+;;; unfill.el --- Unfill paragraphs or regions, and toggle between filled & unfilled
+;;; source: https://github.com/purcell/unfill/blob/master/unfill.el
+
+(defun unfill-paragraph ()
+  "Replace newline chars in current paragraph by single spaces.
+This command does the inverse of `fill-paragraph'."
+  (interactive)
+  (let ((fill-column most-positive-fixnum))
+    (call-interactively 'fill-paragraph)))
+
+(defun unfill-region (start end)
+  "Replace newline chars in region from START to END by single spaces.
+This command does the inverse of `fill-region'."
+  (interactive "r")
+  (let ((fill-column most-positive-fixnum))
+    (fill-region start end)))
+
+(defun unfill-toggle ()
+  "Toggle filling/unfilling of the current region, or current paragraph if no region active."
+  (interactive)
+  (let (deactivate-mark
+        (fill-column
+         (if (eq last-command this-command)
+             (progn (setq this-command nil)
+                    most-positive-fixnum)
+           fill-column)))
+    (call-interactively 'fill-paragraph)))
+
+(define-obsolete-function-alias 'toggle-fill-unfill 'unfill-toggle)
+
+
 ;; source: https://www.emacswiki.org/emacs/TransposeWindows
 (defun transpose-windows (arg)
   "Transpose the buffers shown in two windows."
