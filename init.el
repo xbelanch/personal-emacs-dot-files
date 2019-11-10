@@ -479,6 +479,10 @@
    '(compilation-read-command nil))
   (call-interactively 'compile))
 
+(use-package cmake-mode
+  :ensure t
+  :mode "CMakeLists.txt")
+
 (use-package cc-mode
   :commands (cc-mode)
   :config
