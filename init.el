@@ -44,9 +44,12 @@
 (set-selection-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
 ;; NOTE: This has changed because of this: https://stackoverflow.com/questions/22647517/emacs-encoding-of-pasted-text
-;; Maybe it needs to check if you're working on windows or linux... 
-;; (set-clipboard-coding-system 'utf-16le-dos) ; why?
-(set-clipboard-coding-system 'utf-8) ;
+;; Maybe it needs to check if you're working on windows or linux...
+;; maybe there's a better option to deal with this
+(if (eq system-type 'windows-nt)
+    (set-clipboard-coding-system 'utf-16le-dos)) ;
+(if (eq system-type 'gnu/linux)
+    (set-clipboard-coding-system 'utf-8)) ;
 ;; (#1) Using clipboard/copy paste results in chinese looking characters on Linux Mint (search this on Stack Overflow)
 ;; Exemple of yank url: 瑨灴㩳⼯瑳捡潫敶晲潬⹷潣⽭畱獥楴湯⽳㤹㔵㈷⼵獵湩ⵧ汣灩潢牡ⵤ潣祰瀭獡整爭獥汵獴椭⵮档湩獥ⵥ潬歯湩ⵧ档牡捡整獲搭扥慩⵮楳d
 ;; Now it works: https://stackoverflow.com/questions/9955725/using-clipboard-copy-paste-results-in-chinese-looking-characters-debian-sid
@@ -545,7 +548,7 @@
   (markdown-bold-face ((t (:foreground "Yellow" :weight bold))))
   (markdown-pre-face ((t (:foreground "#bd98fe"))))  
   :config
-  (add-hook 'markdown-mode-hook 'auto-fill-mode 'visual-line-mode))
+  (add-hook 'markdown-mode-hook 'visual-line-mode))
 
 (use-package markdown-mode+
   :after markdown-mode)
