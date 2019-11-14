@@ -88,6 +88,12 @@
 
 
                                         ; === Basic editing conf packages ===
+;; How I missing you some much!
+;; Increment/decrement integer at point
+(use-package evil-numbers
+  :bind (("<kp-add>" . evil-numbers/inc-at-pt)
+         ("<kp-subtract>" . evil-numbers/dec-at-pt)))
+
 ;; Delete selection if insert someting
 (use-package delsel
   :ensure nil
@@ -113,6 +119,9 @@
   (sp-pair "=" "=" :actions '(wrap))
   (sp-pair "+" "+" :actions '(wrap))
   (sp-pair "<" ">" :actions '(wrap))
+  (sp-pair "[" "]" :actions '(wrap))
+  (sp-pair "(" ")" :actions '(wrap))
+  (sp-pair "*" "*" :actions '(wrap))
   (sp-pair "$" "$" :actions '(wrap)))
 
 ;; Recent files
@@ -548,7 +557,8 @@
   (markdown-bold-face ((t (:foreground "Yellow" :weight bold))))
   (markdown-pre-face ((t (:foreground "#bd98fe"))))  
   :config
-  (add-hook 'markdown-mode-hook 'visual-line-mode))
+  (add-hook 'markdown-mode-hook 'visual-line-mode)
+  (add-hook 'markdown-mode-hook #'smartparens-mode))
 
 (use-package markdown-mode+
   :after markdown-mode)
