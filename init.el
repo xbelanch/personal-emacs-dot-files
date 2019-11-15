@@ -790,6 +790,18 @@ This command does the inverse of `fill-region'."
               (neotree-find file-name)))))))
 
 
+;; Set the neo-window-width to the current width of the
+;; neotree window, to trick neotree into resetting the
+;; width back to the actual window width.
+;; Fixes: https://github.com/jaypei/emacs-neotree/issues/262
+;; Source: https://emacs.stackexchange.com/questions/37678/neotree-window-not-resizable
+(eval-after-load "neotree"
+  '(add-to-list 'window-size-change-functions
+                (lambda (frame)
+                  (let ((neo-window (neo-global--get-window)))
+                    (unless (null neo-window)
+                      (setq neo-window-width (window-width neo-window)))))))
+
                                         ; === darktooth-theme
 
 (use-package darktooth-theme
@@ -993,5 +1005,16 @@ Useful to run after `pdf-tools' updates."
 (modify-face 'font-lock-alert-face "OrangeRed" nil nil t nil t nil nil)
 (modify-face 'font-lock-hack-face "gold" nil nil t nil t nil nil)
 
+
+;;; rellotge format 24 hores
+;;; Mostrar fecha y hora
+(setq display-time-day-and-date t
+display-time-24hr-format t)
+(display-time)
+;
+;;; Posar en català el calendari
+(setq calendar-week-start-day 1
+calendar-day-name-array [“Dg” “Dl” “Dt” “Dc” “Dj” “Dv” “Ds”]
+calendar-month-name-array [“Gener” “Febrer” “Març” “Abril” “Maig” “Juny” “Juliol” “Agost” “Setembre” “Octubre” “Novembre” “Decembre”])
 
                                         ;=== END OF init.el ===
