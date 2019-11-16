@@ -1,8 +1,51 @@
-                                        ; === Free Belanche Foundation (cc) 2019   ===
-                                        ; === Load packages ===
+;;; init.el --- 
+;; 
+;; Filename: init.el
+;; Project    : c:/Users/Rotter/AppData/Roaming/.emacs.d/
+;; Description: 
+;; Status: 
+;; Author: xbelanch
+;; Created: sá. nov. 16 23:11:05 2019 (+0100)
+;; Version: 
+;; Last-Updated: 
+;;           By: 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 
+;;; Commentary: 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 
+;;; Change Log:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 
+;; This program is gift-ware. It was created by people working alone
+;; or in cooperation, and is given to you freely as a gift. You may use,
+;; modify, redistribute, and generally hack it about in any way you like,
+;; and you do not have to give us anything in return.
+;; 
+;; However, if you like this product you are encouraged to thank us by
+;; making a return gift to your loved ones and friends. This could be
+;; by writing an add-on package, providing a useful bug report, making an
+;; improvement to the library, or perhaps just releasing the sources of 
+;; your program so that other people can learn from them. If you redistribute
+;; parts of this code or make whatever using it, it would be nice if you
+;; mentioned it somewhere in the credits, but you are not required to do this.
+;; We trust you not to abuse our generosity.
+;; 
+;; DISCLAIMER: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+;; KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.
+;; IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE
+;; BE LIABLE FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR
+;; OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+;; USE OR OTHER DEALINGS IN THE SOFTWARE.
+;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 
+;;; Code:
 
-;; Used packages:
-;; delsel autorevert hungry-delete smartparens recentf undo-tree projectile wgrep ag anzu mwim move-text duplicate-thing all-the-icons posframe dashboard projectile
+
+
+
 ;; Load packages
 ;; If package-check-signature is allow-unsigned, don't
 ;; signal error when we can't verify signature because of
@@ -31,12 +74,16 @@
   (require 'diminish)
   (require 'bind-key))
 
+;; Set directory to add custom elisp code or installing packages
+;; http://ergoemacs.org/emacs/emacs_installing_packages.html
+(add-to-list 'load-path "~/.emacs.d/elisp/")
+
 
 
                                         ; === Default init variables ===
 
 (setq line-width-characters 80)
-
+(setq user-full-name "xbelanch")
                                         ; ===  Default Encoding ===
 
 (prefer-coding-system 'utf-8)
@@ -900,17 +947,10 @@ This command does the inverse of `fill-region'."
   ;; https://github.com/zakame/.emacs.d/blob/379dbfe0f10b20f7f43054cd4d13303d8026d105/init.el#L596-L603
   :if (and (string= system-type 'gnu/linux)
            (eq (call-process-shell-command "pkg-config" nil nil nil "--exists" "poppler") 0))
-  :commands (pdf-tools-install
-             modi/pdf-tools-re-install)
+  :commands (pdf-tools-install)
   :mode (("\\.pdf\\'" . pdf-view-mode))
   :config
   (progn
-    (defvar modi/pdf-tools-bin-directory (let* ((dir-1 (file-name-as-directory (expand-file-name "misc" user-emacs-directory)))
-                                                (dir-2 (file-name-as-directory (expand-file-name "pdf-tools" dir-1)))
-                                                (dir (file-name-as-directory (expand-file-name "bin" dir-2))))
-                                           (make-directory dir :parents)
-                                           dir)
-      "Directory to hold the executable(s) for pdf-tools.")
 
     (setq-default pdf-view-display-size 'fit-page) ; fit page by default
     (setq pdf-view-resize-factor 1.10)
@@ -922,16 +962,6 @@ This command does the inverse of `fill-region'."
     ;; non-nil.
     (pdf-tools-install :no-query-p)
 
-    (defun modi/pdf-tools-re-install ()
-      "Re-install `epdfinfo' even if it is installed.
-The re-installation is forced by deleting the existing `epdfinfo'
-binary.
-Useful to run after `pdf-tools' updates."
-      (interactive)
-      (when (pdf-info-running-p)
-        (pdf-info-kill))
-      (delete-file pdf-info-epdfinfo-program)
-      (pdf-tools-install :no-query-p))
 
     ;; Update `pdf-view-mode-map' bindings
     (dolist (pair '((beginning-of-buffer . pdf-view-first-page)
@@ -1013,8 +1043,54 @@ display-time-24hr-format t)
 (display-time)
 ;
 ;;; Posar en català el calendari
-(setq calendar-week-start-day 1
-calendar-day-name-array [“Dg” “Dl” “Dt” “Dc” “Dj” “Dv” “Ds”]
-calendar-month-name-array [“Gener” “Febrer” “Març” “Abril” “Maig” “Juny” “Juliol” “Agost” “Setembre” “Octubre” “Novembre” “Decembre”])
+;;; font: https://www.emacswiki.org/emacs/CalendarLocalization#toc4
+(setq european-calendar-style 't)
+(setq
+    calendar-week-start-day 1
+    ;; calendar-day-name-array ["diumenge" "dilluns" "dimarts" "dimecres" "dijous" "divendres" "dissabte"]
+    calendar-day-name-array ["dg" "dll" "dm" "dx" "dj" "dv" "ds"]
+    calendar-month-name-array ["gener" "febrer" "març" "abril" "maig" "juny" "juliol" "agost" "setembre" "octubre" "novembre" "desembre"]
+   )
 
-                                        ;=== END OF init.el ===
+;;; Header2
+;;; Automatic insertion and update of file headers.
+;;; Explanation: https://www.emacswiki.org/emacs/AutomaticFileHeaders
+;;; Source custom: https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-header2.el
+(require 'header2)
+
+(defsubst my/header-projectname ()
+  "Insert Project Name"
+  (insert header-prefix-string "Project    : "
+          (when (featurep 'projectile)
+            (replace-regexp-in-string "/proj/\\(.*?\\)/.*"
+                                      "\\1"
+                                      (projectile-project-root)))
+          "\n"))
+(setq make-header-hook '(
+                              ;;header-mode-line
+                              header-title
+                              header-blank
+                              header-file-name
+                              my/header-projectname
+                              header-description
+                              header-status
+                              header-author
+                              header-copyright
+                              header-creation-date
+                              header-version
+                              header-modification-date
+                              header-modification-author
+                              header-end-line
+                              header-commentary
+                              header-end-line
+                              header-history
+                              header-end-line
+                              header-gift-software
+                              header-code
+                              header-eof
+                              ))
+
+(add-hook 'c-mode-common-hook   'auto-make-header)
+ 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; init.el ends here
