@@ -1091,6 +1091,20 @@ display-time-24hr-format t)
                               ))
 
 (add-hook 'c-mode-common-hook   'auto-make-header)
- 
+
+
+;;; Org mode
+;;; Source: https://alhassy.github.io/init/
+(use-package org
+  :ensure org-plus-contrib
+  :config
+  (require 'ox-extra)
+  (ox-extras-activate '(ignore-headlines)))
+
+(use-package org-bullets
+  :ensure t
+  :commands (org-bullets-mode)
+  :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
