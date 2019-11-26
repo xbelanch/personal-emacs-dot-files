@@ -610,11 +610,6 @@
 (use-package markdown-mode+
   :after markdown-mode)
 
-;; https://github.com/mola-T/flymd
-;; markdown on the fly
-(use-package flymd
-  :ensure t)
-
 (use-package markdown-toc
   :ensure t
   :config
@@ -1131,49 +1126,3 @@ display-time-24hr-format t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ag-highligh-search t t)
- '(ag-reuse-buffers t t)
- '(ag-reuse-window t t)
- '(dashboard-center-content t)
- '(dashboard-items (quote ((recents . 10) (projects . 5) (bookmarks . 5))) t)
- '(font-lock-maximum-decoration (quote ((fountain-mode) (t . t))))
- '(google-translate-default-source-language "en" t)
- '(google-translate-default-target-language "ca" t)
- '(imenu-list-auto-resize t)
- '(imenu-list-focus-after-activation t)
- '(magit-auto-revert-mode nil)
- '(neo-theme (quote icons))
- '(package-selected-packages
-   (quote
-    (flymd wgrep-ag yaml-mode which-key wgrep web-mode volatile-highlights use-package undo-tree smartparens rainbow-mode rainbow-delimiters pdf-tools org-present org-plus-contrib org-bullets olivetti nyan-mode neotree mwim move-text markdown-toc markdown-mode+ js2-mode ivy-rich imenu-list hydra hungry-delete highlight-symbol highlight-indent-guides google-translate google-this gitignore-mode github-pullrequest gitconfig-mode gitattributes-mode git-timemachine ggtags fountain-mode flx evil-numbers duplicate-thing diminish diffview dashboard darktooth-theme counsel-projectile copyit-pandoc company-posframe cmake-mode browse-at-remote beacon anzu amx all-the-icons-ivy ag ace-window)))
- '(recentf-auto-cleanup (quote never))
- '(recentf-exclude
-   (quote
-    ((expand-file-name package-user-dir)
-     ".cache" "cache" "recentf" "COMMIT_EDITMSG\\'")))
- '(recentf-max-saved-items 20000000)
- '(wgrep-auto-save-buffer t t)
- '(wgrep-change-readonly-file t t)
- '(wgrep-enable-key "e" t))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(font-lock-variable-name-face ((t (:foreground "violet"))))
- '(imenu-list-entry-face-1 ((t (:foreground "white"))))
- '(markdown-bold-face ((t (:foreground "Yellow" :weight bold))))
- '(markdown-header-delimiter-face ((t (:foreground "mediumpurple"))))
- '(markdown-header-face-1 ((t (:foreground "violet" :weight bold :height 1.9))))
- '(markdown-header-face-2 ((t (:foreground "lightslateblue" :weight bold :height 1.6))))
- '(markdown-header-face-3 ((t (:foreground "mediumpurple1" :weight bold :height 1.4))))
- '(markdown-link-face ((t (:background "#0e1014" :foreground "#bd93f9"))))
- '(markdown-list-face ((t (:foreground "mediumpurple"))))
- '(markdown-pre-face ((t (:foreground "#bd98fe"))))
- '(show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c"))))
- '(vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
