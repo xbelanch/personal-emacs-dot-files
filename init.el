@@ -1036,6 +1036,35 @@ This command does the inverse of `fill-region'."
 (modify-face 'font-lock-hack-face "gold" nil nil t nil t nil nil)
 
 
+                                        ; ==== Hunspell =====
+;; needs to configure under GNU/Linux
+(add-to-list 'exec-path "C:\\cygwin64\\bin\\hunspell.exe")
+(setq ispell-program-name "hunspell")
+(use-package ispell
+ :init
+ (setq ispell-dictionary-alist 
+  '(
+    (nil
+     "[[:alpha:]]"
+     "[^[:alpha:]]"
+     "[']"
+     t
+     ("-d" "default" "-p" "C:\\cygwin64\\usr\\share\\myspell\\en_GB")
+     nil
+     utf-8)
+
+    ("catalan"
+     "[[:alpha:]]"
+     "[^[:alpha:]]"
+     "[']"
+     t
+     ("-d" "catalan" "-p" "C:\\cygwin64\\usr\\share\\myspell\\catalan")
+     nil
+     utf-8)
+    ))
+(setq ispell-dictionary "catalan")
+)
+
 ;;; rellotge format 24 hores
 ;;; Mostrar fecha y hora
 (setq display-time-day-and-date t
