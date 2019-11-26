@@ -1101,28 +1101,10 @@ display-time-24hr-format t)
   (require 'ox-extra)
   (ox-extras-activate '(ignore-headlines)))
 
-(setq org-support-shift-select t)
-
 (use-package org-bullets
   :ensure t
   :commands (org-bullets-mode)
   :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-(use-package org-present
-  :config
-  (with-eval-after-load 'org-present
-    (add-hook 'org-present-mode-hook
-              (lambda ()
-                (org-present-big)
-                (org-display-inline-images)
-                (org-present-hide-cursor)
-                (org-present-read-only)))
-    (add-hook 'org-present-mode-quit-hook
-              (lambda ()
-                (org-present-small)
-                (org-remove-inline-images)
-                (org-present-show-cursor)
-                (org-present-read-write)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
