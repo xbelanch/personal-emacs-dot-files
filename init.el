@@ -1038,11 +1038,12 @@ This command does the inverse of `fill-region'."
 
                                         ; ==== Hunspell =====
 
+(if (eq system-type 'windows-nt) (add-to-list 'exec-path "C:\\cygwin64\\bin\\hunspell.exe"))
+
 (if (eq system-type 'windows-nt)
-    (add-to-list 'exec-path "C:\\cygwin64\\bin\\hunspell.exe")
   (use-package ispell
     :init
-    (setq ispell-dictionary "catalan")
+    (setq ispell-program-name "hunspell")
     (setq ispell-dictionary-alist 
           '(
             (nil
@@ -1062,11 +1063,14 @@ This command does the inverse of `fill-region'."
              ("-d" "catalan" "-p" "C:\\cygwin64\\usr\\share\\myspell\\catalan")
              nil
              utf-8)
-            ))))
+            ))
+    (setq ispell-dictionary "catalan")
+    ))
 
 (if (eq system-type 'gnu/linux)
     (use-package ispell
       :init
+      (setq ispell-program-name "hunspell")
       (setq ispell-dictionary "ca_ES")
       (setq ispell-dictionary-alist 
             '(
@@ -1089,7 +1093,6 @@ This command does the inverse of `fill-region'."
                utf-8)
               ))))
 
-(setq ispell-program-name "hunspell")
 
 ;;; rellotge format 24 hores
 ;;; Mostrar fecha y hora
