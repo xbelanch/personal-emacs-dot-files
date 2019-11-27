@@ -1037,33 +1037,59 @@ This command does the inverse of `fill-region'."
 
 
                                         ; ==== Hunspell =====
-;; needs to configure under GNU/Linux
-(add-to-list 'exec-path "C:\\cygwin64\\bin\\hunspell.exe")
-(setq ispell-program-name "hunspell")
-(use-package ispell
- :init
- (setq ispell-dictionary-alist 
-  '(
-    (nil
-     "[[:alpha:]]"
-     "[^[:alpha:]]"
-     "[']"
-     t
-     ("-d" "default" "-p" "C:\\cygwin64\\usr\\share\\myspell\\en_GB")
-     nil
-     utf-8)
 
-    ("catalan"
-     "[[:alpha:]]"
-     "[^[:alpha:]]"
-     "[']"
-     t
-     ("-d" "catalan" "-p" "C:\\cygwin64\\usr\\share\\myspell\\catalan")
-     nil
-     utf-8)
-    ))
-(setq ispell-dictionary "catalan")
-)
+(if (eq system-type 'windows-nt)
+    (add-to-list 'exec-path "C:\\cygwin64\\bin\\hunspell.exe")
+  (use-package ispell
+    :init
+    (setq ispell-dictionary "catalan")
+    (setq ispell-dictionary-alist 
+          '(
+            (nil
+             "[[:alpha:]]"
+             "[^[:alpha:]]"
+             "[']"
+             t
+             ("-d" "default" "-p" "C:\\cygwin64\\usr\\share\\myspell\\en_GB")
+             nil
+             utf-8)
+
+            ("catalan"
+             "[[:alpha:]]"
+             "[^[:alpha:]]"
+             "[']"
+             t
+             ("-d" "catalan" "-p" "C:\\cygwin64\\usr\\share\\myspell\\catalan")
+             nil
+             utf-8)
+            ))))
+
+(if (eq system-type 'gnu/linux)
+    (use-package ispell
+      :init
+      (setq ispell-dictionary "ca_ES")
+      (setq ispell-dictionary-alist 
+            '(
+              (nil
+               "[[:alpha:]]"
+               "[^[:alpha:]]"
+               "[']"
+               t
+               ("-d" "default" "-p" "/usr/share/hunspell/en_US")
+               nil
+               utf-8)
+
+              ("catalan"
+               "[[:alpha:]]"
+               "[^[:alpha:]]"
+               "[']"
+               t
+               ("-d" "catalan" "-p" "/usr/share/hunspell/ca_ES")
+               nil
+               utf-8)
+              ))))
+
+(setq ispell-program-name "hunspell")
 
 ;;; rellotge format 24 hores
 ;;; Mostrar fecha y hora
