@@ -771,9 +771,9 @@ This command does the inverse of `fill-region'."
   (dashboard-setup-startup-hook)
   :custom
   (dashboard-center-content t)
-  (dashboard-items '((recents . 10)
-                     (projects . 5)
-                     (bookmarks . 5)))
+  (dashboard-items '((recents . 5)
+                     (projects . 10)
+                     (bookmarks . 3)))
   :hook ((after-init     . dashboard-refresh-buffer)
          (dashboard-mode . my/dashboard-banner)))
 
@@ -1163,6 +1163,70 @@ display-time-24hr-format t)
   :ensure t
   :commands (org-bullets-mode)
   :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+
+;; Directory operations
+(use-package dired
+  :ensure nil
+  :bind (:map dired-mode-map
+         ("C-c C-p" . wdired-change-to-wdired-mode))
+  :config
+  ;; Always delete and copy recursively
+  (setq dired-recursive-deletes 'always
+        dired-recursive-copies 'always)
+
+  ;; Show directory first
+  (setq dired-listing-switches "-alh --group-directories-first")
+  ;; Quick sort dired buffers via hydra
+    (use-package dired-quick-sort
+      :bind (:map dired-mode-map
+             ("S" . hydra-dired-quick-sort/body))))
+
+
+;; Show git info in dired
+(use-package dired-git-info
+  :bind (:map dired-mode-map
+              (")" . dired-git-info-mode)))
+
+;; Allow rsync from dired buffers
+(use-package dired-rsync
+  :bind (:map dired-mode-map
+              ("C-c C-r" . dired-rsync)))
+
+;; Colourful dired
+(use-package diredfl
+  :init (diredfl-global-mode 1))
+
+;; Shows icons in dired
+(use-package all-the-icons-dired
+  :diminish
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config
+  (with-no-warnings
+    (defun my-all-the-icons-dired--display ()
+      "Display the icons of files without colors in a dired buffer."
+      (when dired-subdir-alist
+        (let ((inhibit-read-only t))
+          (save-excursion
+            ;; TRICK: Use TAB to align icons
+            (setq-local tab-width 1)
+            (goto-char (point-min))
+            (while (not (eobp))
+              (when (dired-move-to-filename nil)
+                (insert " ")
+                (let ((file (dired-get-filename 'verbatim t)))
+                  (unless (member file '("." ".."))
+                    (let ((filename (dired-get-filename nil t)))
+                      (if (file-directory-p filename)
+                          (insert (all-the-icons-icon-for-dir filename nil ""))
+                        (insert (all-the-icons-icon-for-file file :v-adjust -0.05))))
+                    ;; Align and keep one space for refeshing after some operations
+                    (insert "\t "))))
+              (forward-line 1))))))
+    (advice-add #'all-the-icons-dired--display
+                :override #'my-all-the-icons-dired--display)))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
