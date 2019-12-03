@@ -836,18 +836,14 @@ This command does the inverse of `fill-region'."
           (if file-name
               (neotree-find file-name)))))))
 
+;; https://emacs.stackexchange.com/questions/37678/neotree-window-not-resizable
+(setq neo-window-fixed-size nil)
 
-;; Set the neo-window-width to the current width of the
-;; neotree window, to trick neotree into resetting the
-;; width back to the actual window width.
-;; Fixes: https://github.com/jaypei/emacs-neotree/issues/262
-;; Source: https://emacs.stackexchange.com/questions/37678/neotree-window-not-resizable
-(eval-after-load "neotree"
-  '(add-to-list 'window-size-change-functions
-                (lambda (frame)
-                  (let ((neo-window (neo-global--get-window)))
-                    (unless (null neo-window)
-                      (setq neo-window-width (window-width neo-window)))))))
+
+                                        ; === DOREMI ====
+;; https://www.emacswiki.org/emacs/WindowResize
+(require 'doremi)
+(require 'doremi-cmd)   
 
                                         ; === darktooth-theme
 
@@ -955,8 +951,6 @@ This command does the inverse of `fill-region'."
     (setq-default pdf-view-display-size 'fit-page) ; fit page by default
     (setq pdf-view-resize-factor 1.10)
 
-    (setq pdf-info-epdfinfo-program (expand-file-name "epdfinfo" modi/pdf-tools-bin-directory))
-
     ;; https://github.com/politza/pdf-tools/issues/312#issuecomment-329537742
     ;; Build the program (if necessary) without asking first, if NO-QUERY-P is
     ;; non-nil.
@@ -965,9 +959,7 @@ This command does the inverse of `fill-region'."
 
     ;; Update `pdf-view-mode-map' bindings
     (dolist (pair '((beginning-of-buffer . pdf-view-first-page)
-                    (end-of-buffer . pdf-view-last-page)
-                    (modi/scroll-up . pdf-view-next-line-or-next-page)
-                    (modi/scroll-down . pdf-view-previous-line-or-previous-page)))
+                    (end-of-buffer . pdf-view-last-page)))
       (let ((remap-from (car pair))
             (remap-to (cdr pair)))
         (define-key pdf-view-mode-map `[remap ,remap-from] remap-to)))
@@ -1230,3 +1222,49 @@ display-time-24hr-format t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ag-highligh-search t t)
+ '(ag-reuse-buffers t t)
+ '(ag-reuse-window t t)
+ '(dashboard-center-content t t)
+ '(dashboard-items (quote ((recents . 5) (projects . 10) (bookmarks . 3))) t)
+ '(font-lock-maximum-decoration (quote ((fountain-mode) (t . t))))
+ '(google-translate-default-source-language "en" t)
+ '(google-translate-default-target-language "ca" t)
+ '(imenu-list-auto-resize t t)
+ '(imenu-list-focus-after-activation t t)
+ '(magit-auto-revert-mode nil)
+ '(neo-theme (quote icons) t)
+ '(package-selected-packages
+   (quote
+    (all-the-icons-dired diredfl dired-rsync dired-git-info dired-quick-sort yaml-mode which-key wgrep-ag web-mode volatile-highlights use-package undo-tree smartparens rainbow-mode rainbow-delimiters pdf-tools org-present org-plus-contrib org-bullets olivetti nyan-mode neotree mwim move-text markdown-toc markdown-mode+ js2-mode ivy-rich imenu-list hydra hungry-delete highlight-symbol highlight-indent-guides google-translate google-this gitignore-mode github-pullrequest gitconfig-mode gitattributes-mode git-timemachine ggtags fountain-mode flx evil-numbers duplicate-thing diminish diffview dashboard darktooth-theme counsel-projectile copyit-pandoc company-posframe cmake-mode browse-at-remote beacon anzu amx all-the-icons-ivy ag ace-window)))
+ '(recentf-auto-cleanup (quote never) t)
+ '(recentf-exclude
+   (quote
+    ((expand-file-name package-user-dir)
+     ".cache" "cache" "recentf" "COMMIT_EDITMSG\\'")) t)
+ '(recentf-max-saved-items 20000000 t)
+ '(wgrep-auto-save-buffer t t)
+ '(wgrep-change-readonly-file t t)
+ '(wgrep-enable-key "e" t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(font-lock-variable-name-face ((t (:foreground "violet"))))
+ '(imenu-list-entry-face-1 ((t (:foreground "white"))))
+ '(markdown-bold-face ((t (:foreground "Yellow" :weight bold))))
+ '(markdown-header-delimiter-face ((t (:foreground "mediumpurple"))))
+ '(markdown-header-face-1 ((t (:foreground "violet" :weight bold :height 1.9))))
+ '(markdown-header-face-2 ((t (:foreground "lightslateblue" :weight bold :height 1.6))))
+ '(markdown-header-face-3 ((t (:foreground "mediumpurple1" :weight bold :height 1.4))))
+ '(markdown-link-face ((t (:background "#0e1014" :foreground "#bd93f9"))))
+ '(markdown-list-face ((t (:foreground "mediumpurple"))))
+ '(markdown-pre-face ((t (:foreground "#bd98fe"))))
+ '(show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c"))))
+ '(vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
