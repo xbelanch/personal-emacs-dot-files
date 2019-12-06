@@ -79,6 +79,47 @@
 (add-to-list 'load-path "~/.emacs.d/elisp/")
 
 
+;; Avoid auto save annoying mode
+(setq auto-save-default nil)
+
+;; Don't garbage clean so often
+(setq gc-cons-threshold 100000000)
+
+;;;;
+;;;; Save where I was and what I had open
+;;;; Source: https://github.com/wdenton/.emacs.d/blob/master/init.el
+
+;; Save point position between sessions
+(require 'saveplace)
+(setq-default save-place t)
+(setq save-place-file (expand-file-name ".places" user-emacs-directory))
+
+;; Remember all the buffers I have open
+(desktop-save-mode 1)
+(setq history-length 50)
+(setq desktop-buffers-not-to-save
+      (concat "\\("
+	      "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+	      "\\|\\.emacs.*\\|\\.diary\\|elpa\/*\\|\\.bbdb"
+	      "\\)$"))
+(add-to-list 'desktop-modes-not-to-save 'dired-mode)
+(add-to-list 'desktop-modes-not-to-save 'Info-mode)
+(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+
+;; Disable byte-compile warnings, which I don't care about.
+;; http://tsengf.blogspot.ca/2011/06/disable-byte-compile-warning-in-emacs.html
+(setq byte-compile-warnings '(not nresolved
+                                  free-vars
+                                  callargs
+                                  redefine
+                                  obsolete
+                                  noruntime
+                                  cl-functions
+                                  interactive-only
+                                  ))
+
+
 
                                         ; === Default init variables ===
 
@@ -471,6 +512,26 @@
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
 
+                                        ; C Mode ;
+
+(use-package cc-mode
+  :commands (cc-mode)
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (c-set-offset 'inextern-lang 0)
+              (setq-local c-default-style "K&R")
+              (setq-local indent-tabs-mode nil)
+              (setq-local tab-width 4)
+              (setq-local c-basic-offset 4)))
+  (mapc (lambda (map)
+          (bind-key "C-c c" 'compile-immediate map)
+          (bind-key "C-c n" 'next-error map)
+          (bind-key "C-c p" 'previous-error map))
+        (list c-mode-map
+              c++-mode-map)))
+
+
 
                                         ; === company ===
 
@@ -480,8 +541,9 @@
   :config
   ;; using child frame
   (use-package company-posframe
-    :hook (company-mode . company-posframe-mode))
-  (setq company-idle-delay 0.5)
+    :hook (company-mode . company-posframe-mode)) 
+  ;; Delay when idle because I want to be able to think
+  (setq company-idle-delay 0.2)
   ;; (setq company-show-numbers t)
   (setq company-tooltip-limit 10)
   (setq company-minimum-prefix-length 2)
@@ -489,9 +551,29 @@
   ;; invert the navigation direction if the the completion popup-isearch-match
   ;; is displayed on top (happens near the bottom of windows)
   (setq company-tooltip-flip-when-above t)
+  ;; maybe need a if-then-else shit for Windors and Linux?
+  (setq company-clang-executable "C:\\cygwin64\\bin\\clang-8.exe")
   (global-company-mode))
 
-                                        ; === GIT ===
+                                        ;;;;;;;;;;;;;
+                                        ; YASnippet ;
+                                        ;;;;;;;;;;;;;
+
+;; https://joaotavora.github.io/yasnippet/
+
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :config
+
+  (use-package yasnippet-snippets
+    :ensure t)
+
+  (yas-global-mode 1)
+  )
+                                        ;;;;;;;;;;;;;:;
+                                        ;     GIT     ;
+                                        ;;;;;;;;;;;;;;;
 
 (use-package git-timemachine
   :bind ("M-g t" . git-timemachine-toggle))
@@ -531,34 +613,11 @@
 
                                         ; === LANGUAGES ===
 
-                                        ;=== C/C++ ===
-(defun compile-immediate ()
-  (interactive)
-  (custom-set-variables
-   '(compilation-read-command nil))
-  (call-interactively 'compile))
+                                        ; CMake
 
 (use-package cmake-mode
   :ensure t
   :mode "CMakeLists.txt")
-
-(use-package cc-mode
-  :commands (cc-mode)
-  :config
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (c-set-offset 'inextern-lang 0)
-              (setq-local c-default-style "K&R")
-              (setq-local indent-tabs-mode nil)
-              (setq-local tab-width 4)
-              (setq-local c-basic-offset 4)))
-
-  (mapc (lambda (map)
-          (bind-key "C-c c" 'compile-immediate map)
-          (bind-key "C-c n" 'next-error map)
-          (bind-key "C-c p" 'previous-error map))
-        (list c-mode-map
-              c++-mode-map)))
 
 
                                         ; === Javascript ===
@@ -1135,7 +1194,7 @@ display-time-24hr-format t)
                               header-end-line
                               header-history
                               header-end-line
-                              header-gift-software
+                              ;; header-gift-software                              
                               header-code
                               header-eof
                               ))
@@ -1218,7 +1277,4 @@ display-time-24hr-format t)
     (advice-add #'all-the-icons-dired--display
                 :override #'my-all-the-icons-dired--display)))
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
