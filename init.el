@@ -17,30 +17,6 @@
 ;;; Change Log:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 
-;; This program is gift-ware. It was created by people working alone
-;; or in cooperation, and is given to you freely as a gift. You may use,
-;; modify, redistribute, and generally hack it about in any way you like,
-;; and you do not have to give us anything in return.
-;; 
-;; However, if you like this product you are encouraged to thank us by
-;; making a return gift to your loved ones and friends. This could be
-;; by writing an add-on package, providing a useful bug report, making an
-;; improvement to the library, or perhaps just releasing the sources of 
-;; your program so that other people can learn from them. If you redistribute
-;; parts of this code or make whatever using it, it would be nice if you
-;; mentioned it somewhere in the credits, but you are not required to do this.
-;; We trust you not to abuse our generosity.
-;; 
-;; DISCLAIMER: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
-;; KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.
-;; IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE
-;; BE LIABLE FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR
-;; OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-;; USE OR OTHER DEALINGS IN THE SOFTWARE.
-;; 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 
 ;;; Code:
 
 
@@ -53,6 +29,13 @@
 ;; fatal (bug#17625).
 ;; font: https://emacs.stackexchange.com/questions/233/how-to-proceed-on-package-el-signature-check-failure
 (setq package-check-signature nil)
+
+;; source: https://github.com/wdenton/.emacs.d/blob/master/init.el
+(setq package-archive-priorities
+      '(
+	("melpa" . 20)
+	("gnu" . 10)))
+
 
 (eval-when-compile
   (require 'package)
@@ -74,10 +57,80 @@
   (require 'diminish)
   (require 'bind-key))
 
+;; Make sure that all of the packages I want are installed. If not, install them.
+(setq my-packages '(
+                    ace-window
+                    ag
+                    all-the-icons-dired
+                    all-the-icons-ivy
+                    amx
+                    anzu
+                    beacon
+                    browse-at-remote
+                    cmake-mode
+                    company-posframe
+                    copyit-pandoc
+                    counsel-projectile
+                    darktooth-theme
+                    dashboard
+                    diffview
+                    diminish
+                    dired-git-info
+                    dired-quick-sort
+                    dired-rsync
+                    diredfl
+                    duplicate-thing
+                    evil-numbers
+                    flx
+                    flymd
+                    fountain-mode
+                    ggtags
+                    git-timemachine
+                    gitattributes-mode
+                    gitconfig-mode
+                    github-pullrequest
+                    gitignore-mode
+                    google-this
+                    google-translate
+                    highlight-indent-guides
+                    highlight-symbol
+                    hungry-delete
+                    imenu-list
+                    ivy-rich
+                    js2-mode
+                    markdown-mode+
+                    markdown-toc
+                    move-text
+                    mwim
+                    neotree
+                    nyan-mode
+                    olivetti
+                    org-bullets
+                    org-plus-contrib
+                    org-present
+                    pdf-tools
+                    rainbow-delimiters
+                    rainbow-mode
+                    smartparens
+                    undo-tree
+                    use-package
+                    volatile-highlights
+                    web-mode
+                    wgrep-ag
+                    which-key
+                    yaml-mode
+                    yasnippet-snippets
+		    ))
+(when (not package-archive-contents)
+  (package-refresh-contents))
+(dolist (p my-packages)
+  (when (not (package-installed-p p))
+    (package-install p)))
+
+
 ;; Set directory to add custom elisp code or installing packages
 ;; http://ergoemacs.org/emacs/emacs_installing_packages.html
 (add-to-list 'load-path "~/.emacs.d/elisp/")
-
 
 ;; Avoid auto save annoying mode
 (setq auto-save-default nil)
