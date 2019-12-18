@@ -57,77 +57,6 @@
   (require 'diminish)
   (require 'bind-key))
 
-;; Make sure that all of the packages I want are installed. If not, install them.
-(setq my-packages '(
-                    ace-window
-                    ag
-                    all-the-icons-dired
-                    all-the-icons-ivy
-                    amx
-                    anzu
-                    beacon
-                    browse-at-remote
-                    cmake-mode
-                    company-posframe
-                    copyit-pandoc
-                    counsel-projectile
-                    darktooth-theme
-                    dashboard
-                    diffview
-                    diminish
-                    dired-git-info
-                    dired-quick-sort
-                    dired-rsync
-                    diredfl
-                    duplicate-thing
-                    evil-numbers
-                    flx
-                    flymd
-                    fountain-mode
-                    ggtags
-                    git-timemachine
-                    gitattributes-mode
-                    gitconfig-mode
-                    github-pullrequest
-                    gitignore-mode
-                    google-this
-                    google-translate
-                    highlight-indent-guides
-                    highlight-symbol
-                    hungry-delete
-                    imenu-list
-                    ivy-rich
-                    js2-mode
-                    markdown-mode+
-                    markdown-toc
-                    move-text
-                    mwim
-                    neotree
-                    nyan-mode
-                    olivetti
-                    org-bullets
-                    org-plus-contrib
-                    org-present
-                    pdf-tools
-                    rainbow-delimiters
-                    rainbow-mode
-                    smartparens
-                    undo-tree
-                    use-package
-                    volatile-highlights
-                    web-mode
-                    wgrep-ag
-                    which-key
-                    yaml-mode
-                    yasnippet-snippets
-		    ))
-(when (not package-archive-contents)
-  (package-refresh-contents))
-(dolist (p my-packages)
-  (when (not (package-installed-p p))
-    (package-install p)))
-
-
 ;; Set directory to add custom elisp code or installing packages
 ;; http://ergoemacs.org/emacs/emacs_installing_packages.html
 (add-to-list 'load-path "~/.emacs.d/elisp/")
@@ -1329,5 +1258,76 @@ display-time-24hr-format t)
               (forward-line 1))))))
     (advice-add #'all-the-icons-dired--display
                 :override #'my-all-the-icons-dired--display)))
+
+
+
+;; Make sure that all of the packages I want are installed. If not, install them.
+(setq my-packages '(
+                    ace-window
+                    ag
+                    all-the-icons-dired
+                    all-the-icons-ivy
+                    amx
+                    anzu
+                    beacon
+                    browse-at-remote
+                    cmake-mode
+                    company-posframe
+                    copyit-pandoc
+                    counsel-projectile
+                    darktooth-theme
+                    dashboard
+                    diffview
+                    diminish
+                    dired-git-info
+                    dired-quick-sort
+                    dired-rsync
+                    diredfl
+                    duplicate-thing
+                    evil-numbers
+                    flx
+                    fountain-mode
+                    ggtags
+                    git-timemachine
+                    gitattributes-mode
+                    gitconfig-mode
+                    github-pullrequest
+                    gitignore-mode
+                    google-this
+                    google-translate
+                    highlight-indent-guides
+                    highlight-symbol
+                    hungry-delete
+                    imenu-list
+                    ivy-rich
+                    js2-mode
+                    markdown-mode+
+                    markdown-toc
+                    move-text
+                    mwim
+                    neotree
+                    nyan-mode
+                    olivetti
+                    org-bullets
+                    org-plus-contrib
+                    org-present
+                    pdf-tools
+                    rainbow-delimiters
+                    rainbow-mode
+                    smartparens
+                    undo-tree
+                    use-package
+                    volatile-highlights
+                    web-mode
+                    which-key
+                    yaml-mode
+                    yasnippet-snippets
+		    ))
+(when (not package-archive-contents)
+  (package-refresh-contents))
+(dolist (p my-packages)
+  (when (not (package-installed-p p))
+    (package-install p)))
+
 
 ;;; init.el ends here
