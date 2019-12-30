@@ -533,8 +533,11 @@
   ;; invert the navigation direction if the the completion popup-isearch-match
   ;; is displayed on top (happens near the bottom of windows)
   (setq company-tooltip-flip-when-above t)
-  ;; maybe need a if-then-else shit for Windors and Linux?
-  (setq company-clang-executable "C:\\cygwin64\\bin\\clang-8.exe")
+  ;; assume you using clang-cygwin in windows 
+  (if (eq system-type 'windows-nt)
+      (setq company-clang-executable "C:\\cygwin64\\bin\\clang-8.exe"))
+  (if (eq system-type 'gnu/linux)
+      (setq company-clang-executable "/usr/bin/clang"))
   (global-company-mode))
 
                                         ;;;;;;;;;;;;;
