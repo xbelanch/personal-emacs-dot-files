@@ -1028,6 +1028,7 @@ This command does the inverse of `fill-region'."
 
                                         ; === ggtags ====
 ;; GNU Global Tags
+;; download this pack for windows: http://adoxa.altervista.org/global/
 (use-package ggtags
   :ensure t
   :commands ggtags-mode
@@ -1294,6 +1295,24 @@ display-time-24hr-format t)
   (when (y-or-n-p "Do you want to start Twitch's IRC? ")
     (erc-tls :server "irc.chat.twitch.tv" :port 6697 :nick "rotterchonsy")))
 
+(use-package erc
+  :custom-face
+  (erc-action-face ((t (:foreground "#8fbcbb"))))
+  (erc-error-face ((t (:foreground "#bf616a"))))
+  (erc-input-face ((t (:foreground "#ebcb8b"))))
+  (erc-notice-face ((t (:foreground "#ebcb8b"))))
+  (erc-timestamp-face ((t (:foreground "#a3be8c"))))
+  :custom
+  (erc-fill-function 'erc-fill-static)
+  (erc-fill-static-center 22)
+  (erc-header-line-format "%n on %t (%m)")
+  (erc-join-buffer 'bury)
+  (erc-kill-buffer-on-part t)
+  (erc-kill-queries-on-quit t)
+  (erc-kill-server-buffer-on-quit t)
+  (erc-lurker-threshold-time 43200)
+  (erc-server-reconnect-attempts 5)
+  (erc-server-reconnect-timeout 3))
 
 ;; Make sure that all of the packages I want are installed. If not, install them.
 (setq my-packages '(
