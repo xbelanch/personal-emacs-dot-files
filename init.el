@@ -1263,6 +1263,37 @@ display-time-24hr-format t)
                 :override #'my-all-the-icons-dired--display)))
 
 
+                                        ; === IRC Twitch ===  
+
+(use-package emojify
+  :after erc
+  :defer 15
+  :config
+  (global-emojify-mode)
+  ;; (global-emojify-mode-line-mode -1)
+  )
+
+
+;; Thanks to https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources
+;; Reddit question: https://www.reddit.com/r/emacs/comments/ekhr95/ircerc_twitch_setup/
+;;(setq auth-source-debug t)
+
+;; remember you need to create .authinfo.gpg
+;; and then gpg -c .authinfo
+;; need to verify if that works with Linux
+(setq auth-sources
+    '((:source "~/.emacs.d/secrets/.authinfo.gpg")))
+(auth-source-search :host "irc.chat.twitch.tv" :max 1)
+;; utf-8 always and forever
+(setq erc-server-coding-system '(utf-8 . utf-8))
+;; auto identify
+(setq erc-prompt-for-nickserv-password nil)
+(defun twitch-start-irc ()
+  "Connect to Twitch IRC."
+  (interactive)
+  (when (y-or-n-p "Do you want to start Twitch's IRC? ")
+    (erc-tls :server "irc.chat.twitch.tv" :port 6697 :nick "rotterchonsy")))
+
 
 ;; Make sure that all of the packages I want are installed. If not, install them.
 (setq my-packages '(
@@ -1272,6 +1303,7 @@ display-time-24hr-format t)
                     all-the-icons-ivy
                     amx
                     anzu
+                    auth-source
                     beacon
                     browse-at-remote
                     cmake-mode
@@ -1287,6 +1319,9 @@ display-time-24hr-format t)
                     dired-rsync
                     diredfl
                     duplicate-thing
+                    emojify
+                    erc-hl-nicks
+                    erc-image
                     evil-numbers
                     flx
                     fountain-mode
@@ -1324,8 +1359,7 @@ display-time-24hr-format t)
                     web-mode
                     which-key
                     yaml-mode
-                    yasnippet-snippets
-		    ))
+                    yasnippet-snippets))
 (when (not package-archive-contents)
   (package-refresh-contents))
 (dolist (p my-packages)

@@ -1,5 +1,9 @@
 .#-emacs*
 .cache/*
+emms/*
+emojis/*
+rcirc-log/*
+secrets/*
 *.cache
 .python-environments/*
 auto-save-list/*
