@@ -282,6 +282,7 @@
   :hook (dired-mode . dired-hide-details-mode))
 ;; Colourful Dired
 (use-package diredfl
+  :ensure t
   :init (diredfl-global-mode 1))
 
 ;; Ivy
@@ -399,6 +400,7 @@
   (ivy-rich-mode 1))
 
 (use-package all-the-icons-ivy
+  :ensure t
   :after (all-the-icons ivy)
   :custom (all-the-icons-ivy-buffer-commands '(ivy-switch-buffer-other-window))
   :config
@@ -412,11 +414,12 @@
   :ensure t
   :config
   ;; Enhance fuzzy matching
-  (use-package flx)
+  (use-package flx :ensure t)
   ;; Enhance M-x
-  (use-package amx) ;; https://stackoverflow.com/questions/53026872/m-x-does-not-show-previous-commands
+  (use-package amx :ensure t) ;; https://stackoverflow.com/questions/53026872/m-x-does-not-show-previous-commands
   ;; Ivy integration for Projectile
   (use-package counsel-projectile
+    :ensure t
     :config (counsel-projectile-mode 1))
 
   :config
@@ -510,6 +513,7 @@
 
 ;; Mwin
 (use-package mwim
+  :ensure t
   :bind
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
@@ -650,7 +654,7 @@
 (use-package browse-at-remote
   :bind ("M-g r" . browse-at-remote))
 
-(use-package github-pullrequest)
+(use-package github-pullrequest :ensure t)
 
 
 ;; GNU Global Tags
