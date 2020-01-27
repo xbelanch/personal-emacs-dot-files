@@ -245,6 +245,24 @@
                                         ;--------------------------;
                                         ;--- Packages and Tools ---;
                                         ;--------------------------;
+;; Ido everywhere
+(use-package ido
+  :ensure t
+  :config
+  (setq ido-everywhere t)
+  (setq ido-ubiquitous-mode t)
+  (setq ido-create-new-buffer 'always)
+  (setq ido-file-extensions-order '(".org" ".md" ".markdown" ".c" ".h" ".yaml" ".rb" ".html" ".el" ".ini" ".cfg" ".cnf"))
+  (setq ido-enable-flex-matching t)
+  (ido-mode 1))
+
+;; Smex
+(use-package smex
+  :ensure t
+  :init (smex-initialize)
+  :bind
+  ("M-x" . smex))
+
 ;; AG (Silver searcher)
 (use-package ag
   :ensure t
