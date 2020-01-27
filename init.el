@@ -269,6 +269,12 @@
   :ensure t
   :bind ("C-c C-d" . duplicate-thing))
 
+;; Ace window
+(use-package ace-window
+  :ensure t
+  :bind
+  ("C-x o" . ace-select-window))
+  
 ;; Dired
 (use-package dired
   :ensure nil
