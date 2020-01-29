@@ -240,7 +240,13 @@
 ;; Adding icons with all-the-icons
 (use-package all-the-icons
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  ;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+  ;; you can try setting the following variable:
+  ;; Source: https://github.com/domtronn/all-the-icons.el
+  ;; Source2: https://github.com/domtronn/all-the-icons.el/issues/28
+  (setq inhibit-compacting-font-caches t))
 
                                         ;--------------------------;
                                         ;--- Packages and Tools ---;
@@ -498,7 +504,7 @@
   :hook (after-init . recentf-mode)
   :bind(("C-c r" . counsel-recentf))
   :custom
-  (recentf-max-saved-items 20000000)
+  (recentf-max-saved-items 20)
   (recentf-auto-cleanup 'never)
   (recentf-exclude '((expand-file-name package-user-dir)
                      ".cache"
@@ -600,39 +606,33 @@
 (require 'doremi)
 (require 'doremi-cmd)   
 
-;; company
-;;; sure you wanna use it?
-;; (use-package company
-;;   :ensure t
-;;   :demand t
-;;   :config (setq company-tooltip-align-annotations t))
+(use-package dashboard
+  :ensure t
+  :diminish
+  (dashboard-mode page-break-lines-mode)
+  :preface
+  (defun my/dashboard-banner ()
+    "Set a dashboard banner including information on package initialization
+  time and garbage collections."""
+    (setq dashboard-banner-logo-title
+          (format "Emacs ready in %.2f seconds with %d garbage collections."
+                  (float-time (time-subtract after-init-time before-init-time)) gcs-done))
+    (setq dashboard-footer "Free Belanche Foundation")
+    (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+                                                       :height 1.1
+                                                       :v-adjust -0.05
+                                                       :face 'font-lock-keyword-face)))
 
-;; (use-package dashboard
-;;     :diminish
-;;   (dashboard-mode page-break-lines-mode)
-;;   :preface
-;;   (defun my/dashboard-banner ()
-;;     "Set a dashboard banner including information on package initialization
-;;   time and garbage collections."""
-;;     (setq dashboard-banner-logo-title
-;;           (format "Emacs ready in %.2f seconds with %d garbage collections."
-;;                   (float-time (time-subtract after-init-time before-init-time)) gcs-done))
-;;     (setq dashboard-footer "Free Belanche Foundation")
-;;     (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-;;                                                    :height 1.1
-;;                                                    :v-adjust -0.05
-;;                                                    :face 'font-lock-keyword-face)))
-
-;;   :config
-;;   (setq dashboard-startup-banner (concat user-emacs-directory "mriocbot.png"))
-;;   (dashboard-setup-startup-hook)
-;;   :custom
-;;   (dashboard-center-content t)
-;;   (dashboard-items '((recents . 5)
-;;                      (projects . 10)
-;;                      (bookmarks . 3)))
-;;   :hook ((after-init     . dashboard-refresh-buffer)
-;;          (dashboard-mode . my/dashboard-banner)))
+  :config
+  (setq dashboard-startup-banner (concat user-emacs-directory "TwitchExtrudedWordmarkBlackOps.png"))
+  (dashboard-setup-startup-hook)
+  :custom
+  (dashboard-center-content t)
+  (dashboard-items '((recents . 5)
+                     (projects . 10)
+                     (bookmarks . 3)))
+  :hook ((after-init     . dashboard-refresh-buffer)
+         (dashboard-mode . my/dashboard-banner)))
 
 
 
