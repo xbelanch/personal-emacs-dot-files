@@ -608,29 +608,64 @@
 
 (use-package dashboard
   :ensure t
+  :defer nil
   :diminish
   (dashboard-mode page-break-lines-mode)
   :preface
+  (defun create-scratch-buffer ()
+    "Create a scratch buffer"
+    (interactive)
+    (switch-to-buffer (get-buffer-create "*scratch*"))
+    (lisp-interaction-mode))
   (defun my/dashboard-banner ()
     "Set a dashboard banner including information on package initialization
   time and garbage collections."""
     (setq dashboard-banner-logo-title
-          (format "Emacs ready in %.2f seconds with %d garbage collections."
+          (format "E M A C S ready in %.2f seconds with %d garbage collections."
                   (float-time (time-subtract after-init-time before-init-time)) gcs-done))
-    (setq dashboard-footer "Free Belanche Foundation")
+    (setq dashboard-footer "Gunshow picture #648 by yr friend KC Green")
     (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
                                                        :height 1.1
                                                        :v-adjust -0.05
                                                        :face 'font-lock-keyword-face)))
 
   :config
-  (setq dashboard-startup-banner (concat user-emacs-directory "TwitchExtrudedWordmarkBlackOps.png"))
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-init-info nil)
+  (setq dashboard-startup-banner (concat user-emacs-directory "this-is-fine-gunshow.png"))
   (dashboard-setup-startup-hook)
+  ;;
+  (setq dashboard-set-navigator t)
+  (setq dashboard-navigator-buttons
+        `(;; line1
+          ((,(all-the-icons-faicon "home" :height 1.1 :v-adjust 0.0)
+            "IOC Website"
+            "Open IOC page on your browser"
+            (lambda (&rest _) (browse-url "https://ioc.xtec.cat"))
+            'default)
+           (,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+            "Custom Emacs Commands"
+            "List of useful emacs commands"
+            (lambda (&rest _) (find-file "~/.emacs.d/myemacs.md"))
+            'default)
+           (,(all-the-icons-octicon "pencil" :height 1.1 :v-adjust 0.0)
+            "Open scratch buffer"
+            "Switch to the scratch buffer"
+            (lambda (&rest _) (create-scratch-buffer))
+            'default)
+           (,(all-the-icons-fileicon "emacs" :height 1.1 :v-adjust 0.0)
+            "Open init.el"
+            "Open Emacs configuration file for easy editing"
+            (lambda (&rest _) (find-file "~/.emacs.d/init.el"))
+            'default))))
+  ;;
+  
   :custom
   (dashboard-center-content t)
-  (dashboard-items '((recents . 5)
-                     (projects . 10)
-                     (bookmarks . 3)))
+  (dashboard-items '((recents . 3)
+                     (projects . 3)
+                     (agenda . 3)))
   :hook ((after-init     . dashboard-refresh-buffer)
          (dashboard-mode . my/dashboard-banner)))
 
