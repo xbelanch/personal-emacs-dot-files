@@ -952,4 +952,50 @@ display-time-24hr-format t)
   (when (y-or-n-p "Do you want to start Twitch's IRC? ")
     (erc-tls :server "irc.chat.twitch.tv" :port 6697 :nick "rotterchonsy")))
 
+                                        ;--------------;
+                                        ;--- ESHELL ---;
+                                        ;--------------;
+
+;; Source: https://github.com/snackon/Witchmacs/blob/master/config.org 
+
+(setq eshell-prompt-regexp "^[^αλ\n]*[αλ] ")
+(setq eshell-prompt-function
+      (lambda nil
+        (concat
+         (if (string= (eshell/pwd) (getenv "HOME"))
+             (propertize "~" 'face `(:foreground "#99CCFF"))
+           (replace-regexp-in-string
+            (getenv "HOME")
+            (propertize "~" 'face `(:foreground "#99CCFF"))
+            (propertize (eshell/pwd) 'face `(:foreground "#99CCFF"))))
+         (if (= (user-uid) 0)
+             (propertize " α " 'face `(:foreground "#FF6666"))
+         (propertize " λ " 'face `(:foreground "#A6E22E"))))))
+
+(setq eshell-highlight-prompt nil)
+
+(defalias 'open 'find-file-other-window)
+(defalias 'clean 'eshell/clear-scrollback)
+
+(defun eshell/sudo-open (filename)
+  "Open a file as root in Eshell."
+  (let ((qual-filename (if (string-match "^/" filename)
+                           filename
+                         (concat (expand-file-name (eshell/pwd)) "/" filename))))
+    (switch-to-buffer
+     (find-file-noselect
+      (concat "/sudo::" qual-filename)))))
+
+(defun eshell-other-window ()
+  "Create or visit an eshell buffer."
+  (interactive)
+  (if (not (get-buffer "*eshell*"))
+      (progn
+        (split-window-sensibly (selected-window))
+        (other-window 1)
+        (eshell))
+    (switch-to-buffer-other-window "*eshell*")))
+
+(global-set-key (kbd "<s-C-return>") 'eshell-other-window)
+
 ;; --- end of init.el
