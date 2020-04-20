@@ -2,7 +2,7 @@
 
 
 `C-M i`: Ispell for a selected word
-
+`C-c C-f`: Fold and unfold!
 
 ## Issues
 

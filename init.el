@@ -65,6 +65,13 @@
 ;; Disable yes-or-no messages
 (defalias 'yes-or-no-p #'y-or-n-p)
 
+;; Save history (pendent of revision)
+;; https://github.com/syl20bnr/spacemacs/issues/9409
+(setq history-length 100)
+(put 'minibuffer-history 'history-length 50)
+(put 'evil-ex-history 'history-length 50)
+(put 'kill-ring 'history-length 25)
+
 
 ;; Default Encoding
 (prefer-coding-system 'utf-8)
@@ -226,16 +233,18 @@
 (setq frame-title-format nil)
 
 ;; Setting default font
-(set-face-attribute 'default nil :font "Iosevka")
+(set-face-attribute 'default nil :font "Fantasque Sans Mono")
 (setq-default line-spacing 0.001)
-(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default nil :height 130)
 (set-face-attribute 'default nil :weight 'normal)
 
 ;; Setting my favorite theme
 (use-package darktooth-theme :ensure t  :config  (load-theme 'darktooth t))
 
-;; Set the cursor as a vertical bar
-(setq-default cursor-type 'bar)
+;; Set the cursor as a box
+;; Font: https://www.gnu.org/software/emacs/manual/html_node/elisp/Cursor-Parameters.html
+(setq-default cursor-type 'box)
+(set-cursor-color "#ff00ff") 
 
 ;; Adding icons with all-the-icons
 (use-package all-the-icons
@@ -606,6 +615,20 @@
 (require 'doremi)
 (require 'doremi-cmd)   
 
+
+;; Valid font families are 'material 'wicon 'octicon 'faicon 'fileicon and 'alltheicon
+
+;;(all-the-icons-insert-icons-for 'alltheicon)   ;; Prints all the icons for `alltheicon' font set
+
+;(all-the-icons-insert-icons-for 'octicon 10)   ;; Prints all the icons for the `octicon' family
+                                               ;; and makes the icons height 10
+
+;;(all-the-icons-insert-icons-for 'faicon 1 0.5) ;; Prints all the icons for the `faicon' family
+                                               ;; and also waits 0.5s between printing each one - apache
+
+;; What to display when Emacs starts?
+;; One option is dashboard:
+
 (use-package dashboard
   :ensure t
   :defer nil
@@ -623,7 +646,7 @@
     (setq dashboard-banner-logo-title
           (format "E M A C S ready in %.2f seconds with %d garbage collections."
                   (float-time (time-subtract after-init-time before-init-time)) gcs-done))
-    (setq dashboard-footer "Gunshow picture #648 by yr friend KC Green")
+    ;(setq dashboard-footer "Gunshow picture #648 by yr friend KC Green") 
     (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
                                                        :height 1.1
                                                        :v-adjust -0.05
@@ -633,39 +656,43 @@
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-set-init-info nil)
-  (setq dashboard-startup-banner (concat user-emacs-directory "this-is-fine-gunshow.png"))
+  ; remove next line and comment the next one if you want to display a logo
+  (setq dashboard-startup-banner (concat user-emacs-directory "rotter_lyud_necrots_inside.png"))
+  ;; (setq dashboard-startup-banner nil)
   (dashboard-setup-startup-hook)
   ;;
   (setq dashboard-set-navigator t)
-  (setq dashboard-navigator-buttons
-        `(;; line1
-          ((,(all-the-icons-faicon "home" :height 1.1 :v-adjust 0.0)
-            "IOC Website"
-            "Open IOC page on your browser"
-            (lambda (&rest _) (browse-url "https://ioc.xtec.cat"))
-            'default)
-           (,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
-            "Custom Emacs Commands"
-            "List of useful emacs commands"
-            (lambda (&rest _) (find-file "~/.emacs.d/myemacs.md"))
-            'default)
-           (,(all-the-icons-octicon "pencil" :height 1.1 :v-adjust 0.0)
-            "Open scratch buffer"
-            "Switch to the scratch buffer"
-            (lambda (&rest _) (create-scratch-buffer))
-            'default)
-           (,(all-the-icons-fileicon "emacs" :height 1.1 :v-adjust 0.0)
-            "Open init.el"
-            "Open Emacs configuration file for easy editing"
-            (lambda (&rest _) (find-file "~/.emacs.d/init.el"))
-            'default))))
+  ;; Icons doesnt work on Windows :-/
+  ;; (setq dashboard-navigator-buttons
+  ;;       `(;; line1
+  ;;         ((,(all-the-icons-wicon "tornado" :height 0.9)
+  ;;           "IOC Website"
+  ;;           "Open IOC page on your browser"
+  ;;           (lambda (&rest _) (browse-url "https://ioc.xtec.cat"))
+  ;;           'default)
+  ;;          (,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+  ;;           "Custom Emacs Commands"
+  ;;           "List of useful emacs commands"
+  ;;           (lambda (&rest _) (find-file "~/.emacs.d/myemacs.md"))
+  ;;           'default)
+  ;;          (,(all-the-icons-octicon "pencil" :height 1.1 :v-adjust 0.0)
+  ;;           "Open scratch buffer"
+  ;;           "Switch to the scratch buffer"
+  ;;           (lambda (&rest _) (create-scratch-buffer))
+  ;;           'default)
+  ;;          (,(all-the-icons-fileicon "emacs" :height 1.1 :v-adjust 0.0)
+  ;;           "Open init.el"
+  ;;           "Open Emacs configuration file for easy editing"
+  ;;           (lambda (&rest _) (find-file "~/.emacs.d/init.el"))
+  ;;           'default))))
   ;;
   
   :custom
   (dashboard-center-content t)
-  (dashboard-items '((recents . 3)
-                     (projects . 3)
-                     (agenda . 3)))
+  (dashboard-items '((recents . 6)
+                     (bookmarks . 6)
+                     (projects . 6)
+                     (agenda . 4)))
   :hook ((after-init     . dashboard-refresh-buffer)
          (dashboard-mode . my/dashboard-banner)))
 
@@ -791,18 +818,27 @@
   (add-hook 'sgml-mode-hook 'emmet-mode)
   (add-hook 'web-mode-hook 'emmet-mode))
 
-(use-package js2-mode
-  :ensure t
-  :mode "\\.js\\'"
-  :interpreter "node"
-  :init
-  (setq-default js2-concat-multiline-strings 'eol)
-  (setq-default js2-strict-trailing-comma-warning t)
-  (setq-default js2-strict-inconsistent-return-warning nil)
-  :config
-  (use-package prettier-js :ensure t)
-  (use-package json-mode :ensure t))
-  
+;; https://emacs.cafe/emacs/javascript/setup/2017/04/23/emacs-setup-javascript.html
+(use-package js2-mode :ensure t)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+;; Better imenu
+(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+(use-package js2-refactor :ensure t)
+(use-package xref-js2 :ensure t)
+
+(add-hook 'js2-mode-hook #'js2-refactor-mode)
+(js2r-add-keybindings-with-prefix "C-c C-r")
+(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+;; unbind it.
+(define-key js-mode-map (kbd "M-.") nil)
+
+(add-hook 'js2-mode-hook (lambda ()
+  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+
+  (add-hook 'web-mode-hook 'electric-pair-mode)
                                         ;-------------------------;
                                         ;--- Other Major Modes ---;
                                         ;-------------------------;
@@ -908,6 +944,10 @@ display-time-24hr-format t)
         '("◉" "◎" "○" "○" "○" "○")))
 (setq org-hide-leading-stars t)
 
+(setq-default org-display-custom-times t)
+(setq org-time-stamp-custom-formats 
+  '("<%a %d %b %Y" . "<%a %d %b %Y %H:%M>"))
+
                                         ;---------------;
                                         ;--- ERC/IRC ---;
                                         ;---------------;
@@ -996,6 +1036,6 @@ display-time-24hr-format t)
         (eshell))
     (switch-to-buffer-other-window "*eshell*")))
 
-(global-set-key (kbd "<s-C-return>") 'eshell-other-window)
+(global-set-key (kbd "C-c RET") 'eshell-other-window)
 
 ;; --- end of init.el
