@@ -9,58 +9,21 @@
       calendar-longitude 2.181137
       calendar-location-name "Barcelona, Spain")
 
-;; Add MELPA
-(when (>= emacs-major-version 24)
-  (require 'package)
+(require 'package)
+(add-to-list 'package-archives
   (add-to-list 'package-archives '("MELPA" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("ORG" . "https://orgmode.org/elpa/") t))
-
 (package-initialize)
 
-;; Bootstrap `use-package`
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-(require 'use-package)
+
+(eval-when-compile (require 'use-package))
 
 ;; Set directory to add custom elisp code or installing packages
 ;; http://ergoemacs.org/emacs/emacs_installing_packages.html
 (add-to-list 'load-path "~/.emacs.d/elisp/")
-
-;; Making Emacs secure
-;; Source: https://github.com/DiegoVicen/my-emacs
-;; @NOTE: At this moment it raises an error :-(
-(setq tls-checktrust t)
-;; This snippet is ready to work in both UNIX-like and Windows OS
-(let ((trustfile
-       (replace-regexp-in-string
-        "\\\\" "/"
-        (replace-regexp-in-string
-         "\n" ""
-         (shell-command-to-string (concat "python3 -m certifi"))))))
-  (setq tls-program
-        (list
-         (format "gnutls-cli%s --x509cafile %s -p %%p %%h"
-                 (if (eq window-system 'w32) ".exe" "") trustfile)))
-  ;; (setq gnutls-verify-error t)
-  (setq gnutls-trustfiles (list trustfile)))
-
-(defun check-tls-config ()
-  "Check for correctness in the TLS configuration for Emacs."
-  (interactive)
-  (let ((bad-hosts
-         (cl-loop for bad
-               in `("https://wrong.host.badssl.com/"
-                    "https://self-signed.badssl.com/")
-               if (condition-case e
-                      (url-retrieve
-                       bad (lambda (retrieved) t))
-                    (error nil))
-               collect bad)))
-    (if bad-hosts
-        (error (format "TLS misconfigured; retrieved %s ok" bad-hosts))
-      (url-retrieve "https://badssl.com"
-                    (lambda (retrieved) t)))))
 
 ;; Disable yes-or-no messages
 (defalias 'yes-or-no-p #'y-or-n-p)
@@ -94,20 +57,6 @@
 (setq save-buffer-coding-system 'utf-8) ; nil
 (setq process-coding-system-alist
       (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
-
-
-;; Remember all the buffers I have open
-(desktop-save-mode 1)
-(setq history-length 50)
-(setq desktop-buffers-not-to-save
-      (concat "\\("
-	      "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
-	      "\\|\\.emacs.*\\|\\.diary\\|elpa\/*\\|\\.bbdb"
-	      "\\)$"))
-(add-to-list 'desktop-modes-not-to-save 'dired-mode)
-(add-to-list 'desktop-modes-not-to-save 'Info-mode)
-(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
-(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
 
 ;; Disable byte-compile warnings, which I don't care about.
 ;; Source: http://tsengf.blogspot.ca/2011/06/disable-byte-compile-warning-in-emacs.html
@@ -147,12 +96,6 @@
       mouse-wheel-progressive-speed nil
       mouse-wheel-follow-mouse 't)
 
-;; Real auto-save feature
-(use-package real-auto-save
-  :ensure t
-  :demand t
-  :config (setq real-auto-save-interval 10)
-  :hook (prog-mode . real-auto-save-mode))
 
 ;; Insert new line without breaking
 (defun insert-new-line-below ()
@@ -198,7 +141,6 @@
 (unbind-key "C-z")
 (bind-key "C-z" 'undo)
 (bind-key "C-c f" 'find-file)
-(bind-key "C-x e" 'other-frame)
 (bind-key "C-c C-v" 'revert-buffer)
 (bind-key "C-q" 'kill-buffer)
 (bind-key "M-q" 'query-replace-regexp)
@@ -257,9 +199,9 @@
   ;; Source2: https://github.com/domtronn/all-the-icons.el/issues/28
   (setq inhibit-compacting-font-caches t))
 
-                                        ;--------------------------;
-                                        ;--- Packages and Tools ---;
-                                        ;--------------------------;
+                                         ;--------------------------;
+                                         ;--- Packages and Tools ---;
+                                         ;--------------------------;
 ;; Ido everywhere
 (use-package ido
   :ensure t
@@ -502,11 +444,6 @@
   :ensure t
   :bind (("C-c i" . iedit-mode)))
 
-;; rainbow-delimiters
-(use-package rainbow-delimiters
-  :ensure t
-  :hook (prog-mode . rainbow-delimiters-mode))
-
 ;; Recent files
 (use-package recentf
   :ensure nil
@@ -699,7 +636,7 @@
 
 
 
-                                        ;_________________________;
+                                        ;-------------------------;
                                         ;--- Programming Modes ---;
                                         ;-------------------------;
 
@@ -761,9 +698,24 @@
                 (when (derived-mode-p 'c-mode 'c++-mode 'asm-mode)
                   (ggtags-mode 1)))))
 
-                                        ;------------------------;
-                                        ;--- Web debvelopment ---;
-                                        ;------------------------;
+                                         ;---------------------;
+                                         ;--- Smart Parents ---;
+                                         ;---------------------;
+
+;; Source: https://ebzzry.io/en/emacs-pairs/ 
+(use-package smartparens-config
+  :ensure smartparens
+  :config (progn (show-smartparens-global-mode t)))
+
+(add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+(add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
+(add-hook 'js2-mode-hook #'smartparens-mode)
+
+
+
+                                         ;------------------------;
+                                         ;--- Web debvelopment ---;
+                                         ;------------------------;
 
 (use-package web-mode
   :ensure t
@@ -775,8 +727,7 @@
   (setq js-indent-level 2)
   (setq web-mode-enable-auto-pairing t)
   (setq web-mode-enable-auto-expanding t)
-  (setq web-mode-enable-css-colorization t)
-  (add-hook 'web-mode-hook 'electric-pair-mode))
+  (setq web-mode-enable-css-colorization t))
 
 (use-package web-beautify
   :ensure t
@@ -837,8 +788,8 @@
 
 (add-hook 'js2-mode-hook (lambda ()
   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-
   (add-hook 'web-mode-hook 'electric-pair-mode)
+
                                         ;-------------------------;
                                         ;--- Other Major Modes ---;
                                         ;-------------------------;
@@ -912,9 +863,9 @@ display-time-24hr-format t)
     calendar-day-name-array ["dg" "dll" "dm" "dx" "dj" "dv" "ds"]
     calendar-month-name-array ["gener" "febrer" "març" "abril" "maig" "juny" "juliol" "agost" "setembre" "octubre" "novembre" "desembre"]
    )
-                                        ;-----------;
-                                        ;--- ORG ---;
-                                        ;-----------;
+                                         ;-----------;
+                                         ;--- ORG ---;
+                                         ;-----------;
 
 
 (use-package org
