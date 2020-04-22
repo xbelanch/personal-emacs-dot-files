@@ -10,9 +10,14 @@
       calendar-location-name "Barcelona, Spain")
 
 (require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives '())
 (add-to-list 'package-archives
-  (add-to-list 'package-archives '("MELPA" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("ORG" . "https://orgmode.org/elpa/") t))
+             '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("org" . "https://orgmode.org/elpa/") t)
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
