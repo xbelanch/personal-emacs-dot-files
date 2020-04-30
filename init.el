@@ -631,7 +631,7 @@
   
   :custom
   (dashboard-center-content t)
-  (dashboard-items '((recents . 6)
+  (dashboard-items '((recents . 10)
                      (bookmarks . 6)
                      (projects . 6)
                      (agenda . 4)))
@@ -742,21 +742,6 @@
              web-beautify-html-buffer
              web-beautify-js
              web-beautify-js-buffer))
-
-
-(defun surround-html (start end tag)
-   "Wraps the specified region (or the current 'symbol / word'
- with a properly formatted HTML tag."
-   (interactive "r\nsTag: " start end tag)
-   (save-excursion
-     (narrow-to-region start end)
-     (goto-char (point-min))
-     (insert (format "<%s>" tag))
-     (goto-char (point-max))
-     (insert (format "</%s>" tag))
-     (widen)))
-
-;; (define-key html-mode-map (kbd "C-c C-w") 'surround-html)
 
 (use-package emmet-mode
   :ensure t
@@ -993,5 +978,22 @@ display-time-24hr-format t)
     (switch-to-buffer-other-window "*eshell*")))
 
 (global-set-key (kbd "C-c RET") 'eshell-other-window)
+
+                                        ;-----------------------------------;
+                                        ;--- Insert time stamp functions ---;
+                                        ;-----------------------------------;
+
+;; Source:
+;; https://stackoverflow.com/questions/251908/how-can-i-insert-current-date-and-time-into-a-file-using-emacs
+(defun now ()
+  "Insert string for the current time formatted like '2:34 PM'."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "%D %-I:%M %p")))
+
+(defun today ()
+  "Insert string for today's date nicely formatted in American style,
+e.g. Sunday, September 17, 2000."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "%A, %B %e, %Y")))
 
 ;; --- end of init.el
