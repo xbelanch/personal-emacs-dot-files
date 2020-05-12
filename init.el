@@ -996,4 +996,17 @@ e.g. Sunday, September 17, 2000."
   (interactive)                 ; permit invocation in minibuffer
   (insert (format-time-string "%A, %B %e, %Y")))
 
+                                        ;-------------------------;
+                                        ;--- Persisten scratch ---;
+                                        ;-------------------------;
+
+
+;; Source:
+;; https://github.com/Fanael/persistent-scratch
+(use-package persistent-scratch
+  :ensure t
+  :config
+  (persistent-scratch-setup-default))
+
+
 ;; --- end of init.el
