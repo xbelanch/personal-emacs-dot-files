@@ -659,6 +659,48 @@
               (setq-local c-basic-offset 4)))
   (list c-mode-map c++-mode-map))
 
+;; C# - Unity
+;; https://gist.github.com/kurogomapurin/42386006f9aaa7187840
+;; https://joshwolfe.ca/post/emacs-for-csharp/
+;; Compile https://stackoverflow.com/questions/6319274/how-do-i-run-msbuild-from-the-command-line-using-windows-sdk-7-1
+
+;; Finalment, la millor opció és fer servir el omnisharp-server-install
+;; en el moment de fer l'start ens demanarà el root (on tinguem l'sln.)
+
+(use-package company
+  :ensure t)
+
+(require 'csharp-mode)
+(add-hook 'csharp-mode-hook
+	  '(lambda()
+	     (setq comment-column 40)
+	     (setq c-basic-offset 4)
+	     (omnisharp-mode)
+	     )
+	  )
+
+(use-package omnisharp
+  :after company
+  :config
+  (add-hook 'csharp-mode-hook 'omnisharp-mode)
+  (add-to-list 'company-backends 'company-omnisharp))
+
+;; (use-package omnisharp
+;;   :ensure t
+;;   :config
+;;   (setq omnisharp-server-executable-path "R:/MyLastSummerCar/tools/omnisharp-server/OmniSharp/bin/Debug/OmniSharp.exe" ))
+
+;; (use-package csharp-mode
+;;   :ensure t
+;;   :mode ("\\.cs$" . csharp-mode)
+;;   :config
+;;   (add-hook 'csharp-mode-hook
+;;             (lambda ()
+;;               (setq-local comment-column 40)
+;;               (setq-local tab-width 4)
+;;               (setq-local c-basic-offset 4)
+;;               (omnisharp-mode))))
+
 ;; Git/Magit
 (use-package git-timemachine
   :ensure t
