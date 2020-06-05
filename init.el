@@ -204,9 +204,25 @@
   ;; Source2: https://github.com/domtronn/all-the-icons.el/issues/28
   (setq inhibit-compacting-font-caches t))
 
-                                         ;--------------------------;
-                                         ;--- Packages and Tools ---;
-                                         ;--------------------------;
+
+                                        ;-------------------------;
+                                        ;--- Desktop save/read ---;
+                                        ;-------------------------;
+
+(setq desktop-buffers-not-to-save
+      (concat "\\("
+              "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+              "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+              "\\)$"))
+(add-to-list 'desktop-modes-not-to-save 'dired-mode)
+(add-to-list 'desktop-modes-not-to-save 'Info-mode)
+(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+
+
+                                        ;--------------------------;
+                                        ;--- Packages and Tools ---;
+                                        ;--------------------------;
 ;; Ido everywhere
 (use-package ido
   :ensure t
@@ -852,7 +868,9 @@
 (use-package fountain-mode
   :ensure t
   :config
-  (fountain-set-font-lock-decoration 2)
+  ;; @BUG?
+  ;; Error (use-package): fountain-mode/:config: Symbol’s function definition is void: fountain-set-font-lock-decoration
+  ;; (fountain-set-font-lock-decoration 2)
   (set-face-attribute 'fountain-scene-heading nil :foreground "#202226" :weight 'bold)
   (add-to-list 'auto-mode-alist '("\\.fountain$" . fountain-mode))
   (add-hook 'fountain-mode-hook (lambda () (turn-on-olivetti-mode)))
