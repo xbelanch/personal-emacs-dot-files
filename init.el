@@ -209,6 +209,7 @@
                                         ;--- Desktop save/read ---;
                                         ;-------------------------;
 
+(desktop-save-mode 1) ;; uses the after-init-hook
 (setq desktop-buffers-not-to-save
       (concat "\\("
               "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
