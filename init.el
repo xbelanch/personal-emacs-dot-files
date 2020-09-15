@@ -1046,10 +1046,11 @@ display-time-24hr-format t)
 
 ;; Source:
 ;; https://stackoverflow.com/questions/251908/how-can-i-insert-current-date-and-time-into-a-file-using-emacs
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-Parsing.html
 (defun now ()
   "Insert string for the current time formatted like '2:34 PM'."
   (interactive)                 ; permit invocation in minibuffer
-  (insert (format-time-string "%D %-I:%M %p")))
+  (insert (format-time-string "(%A %d/%m/%Y %-H:%M)")))
 
 (defun today ()
   "Insert string for today's date nicely formatted in American style,
