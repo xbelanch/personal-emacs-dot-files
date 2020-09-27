@@ -288,6 +288,22 @@
   :ensure t
   :init (diredfl-global-mode 1))
 
+;; Duplicate this file
+;; source: https://emacs.stackexchange.com/questions/60661/how-to-duplicate-a-file-in-dired
+(defun dired-duplicate-this-file ()
+  "Duplicate file on this line."
+  (interactive)
+  (let* ((this  (dired-get-filename t))
+         (ctr   1)
+         (new   (format "%s[%d]" this ctr)))
+    (while (file-exists-p new)
+      (setq ctr  (1+ ctr)
+            new  (format "%s[%d]" this ctr)))
+     (dired-copy-file this new nil))
+  (revert-buffer))
+
+
+
 ;; Ivy
 (use-package ivy
   :ensure t
