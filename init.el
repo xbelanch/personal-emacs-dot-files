@@ -703,21 +703,24 @@
 (use-package company
   :ensure t)
 
-(require 'csharp-mode)
-(add-hook 'csharp-mode-hook
-	  '(lambda()
-	     (setq comment-column 40)
-	     (setq c-basic-offset 4)
-	     (omnisharp-mode)
-	     )
-	  )
+(if (eq system-type 'windows-nt)
+    (require 'csharp-mode)
+  (add-hook 'csharp-mode-hook
+            '(lambda()
+               (setq comment-column 40)
+               (setq c-basic-offset 4)
+               (omnisharp-mode)
+               )
+            )
+)
 
-(use-package omnisharp
-  :after company
-  :config
-  (add-hook 'csharp-mode-hook 'omnisharp-mode)
-  (add-to-list 'company-backends 'company-omnisharp))
-
+(if (eq system-type 'windows-nt)
+  (use-package omnisharp
+    :after company
+    :config
+    (add-hook 'csharp-mode-hook 'omnisharp-mode)
+    (add-to-list 'company-backends 'company-omnisharp))
+)
 ;; (use-package omnisharp
 ;;   :ensure t
 ;;   :config
