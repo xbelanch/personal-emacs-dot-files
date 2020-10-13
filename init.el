@@ -604,6 +604,7 @@
 ;; What to display when Emacs starts?
 ;; One option is dashboard:
 
+
 (use-package dashboard
   :ensure t
   :defer nil
@@ -1088,6 +1089,22 @@ e.g. Sunday, September 17, 2000."
   :ensure t
   :config
   (persistent-scratch-setup-default))
+
+                                        ;-----------------------------------;
+                                        ;--- Path filename to clipboard  ---;
+                                        ;-----------------------------------;
+
+(defun copy-file-path-on-clipboard ()
+  "Put the current file name on the clipboard"
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (with-temp-buffer
+        (insert filename)
+        (clipboard-kill-region (point-min) (point-max)))
+      (message filename))))
 
 
 ;; --- end of init.el
