@@ -153,6 +153,27 @@
 (bind-key "s->" 'end-of-buffer)
 (bind-key "C-c C-w" 'fill-paragraph)
 
+;; Handle with backup emacs files
+;; Source: https://stackoverflow.com/questions/2680389/how-to-remove-all-files-ending-with-made-by-emacs
+;; https://www.emacswiki.org/emacs/BackupDirectory
+(setq backup-directory-alist
+          `((".*" . ,temporary-file-directory)))
+
+(message "Deleting old backup files...")
+(let ((week (* 60 60 24 7))
+      (current (float-time (current-time))))
+  (dolist (file (directory-files temporary-file-directory t))
+    (when (and (backup-file-name-p file)
+               (> (- current (float-time (nth 5 (file-attributes file))))
+                  week))
+      (message "%s" file)
+      (delete-file file))))
+
+;; How to switch between windows quickly?
+;; Source: https://emacs.stackexchange.com/questions/3458/how-to-switch-between-windows-quickly
+
+(windmove-default-keybindings 'shift)
+
 
                                         ;---------------------------;
                                         ;--- Graphical Interface ---;
