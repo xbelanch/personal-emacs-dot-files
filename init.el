@@ -174,6 +174,9 @@
 
 (windmove-default-keybindings 'shift)
 
+;; or using ctrl tab for switch buffers 
+(global-set-key (kbd "<C-tab>") 'next-buffer)
+
 
                                         ;---------------------------;
                                         ;--- Graphical Interface ---;
