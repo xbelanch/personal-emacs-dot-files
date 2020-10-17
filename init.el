@@ -1,54 +1,198 @@
-                                        ; === Free Belanche Foundation (cc) 2019   ===
-                                        ; === Load packages ===
+                                        ;-------------------------;
+                                        ;--- Basic Emacs Setup ---;
+                                        ;-------------------------;
 
-;; Used packages:
-;; delsel autorevert hungry-delete smartparens recentf undo-tree projectile wgrep ag anzu mwim move-text duplicate-thing all-the-icons posframe dashboard projectile
-;; Load packages
-;; If package-check-signature is allow-unsigned, don't
-;; signal error when we can't verify signature because of
-;; missing public key.  Other errors are still treated as
-;; fatal (bug#17625).
-;; font: https://emacs.stackexchange.com/questions/233/how-to-proceed-on-package-el-signature-check-failure
-(setq package-check-signature nil)
+;; My personal information
+(setq user-full-name "Xavier Belanche"
+      user-mail-address "xbelanch@protonmail.com"
+      calendar-latitude 41.499959
+      calendar-longitude 2.181137
+      calendar-location-name "Barcelona, Spain")
 
-(eval-when-compile
-  (require 'package)
-  (package-initialize)
-  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives '())
+(add-to-list 'package-archives
+             '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("org" . "https://orgmode.org/elpa/") t)
+(package-initialize)
 
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package)
-    (package-install 'diminish)
-    (package-install 'bind-key))
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-  (setq use-package-always-ensure t)
-  (setq use-package-expand-minimally t)
+(eval-when-compile (require 'use-package))
 
-  (require 'use-package)
-  (require 'diminish)
-  (require 'bind-key))
+;; Set directory to add custom elisp code or installing packages
+;; http://ergoemacs.org/emacs/emacs_installing_packages.html
+(add-to-list 'load-path "~/.emacs.d/elisp/")
+
+;; Disable yes-or-no messages
+(defalias 'yes-or-no-p #'y-or-n-p)
+
+;; Save history (pendent of revision)
+;; https://github.com/syl20bnr/spacemacs/issues/9409
+(setq history-length 100)
+(put 'minibuffer-history 'history-length 50)
+(put 'evil-ex-history 'history-length 50)
+(put 'kill-ring 'history-length 25)
 
 
-
-                                        ; === Default init variables ===
-
-;; Global variables
-(setq line-width-characters 80)
 ;; Default Encoding
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-selection-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
-(set-clipboard-coding-system 'utf-8) ; included by set-selection-coding-system
+;; NOTE: This has changed because of this: https://stackoverflow.com/questions/22647517/emacs-encoding-of-pasted-text
+;; Maybe it needs to check if you're working on windows or linux...
+;; maybe there's a better option to deal with this
+(if (eq system-type 'windows-nt)
+    (set-clipboard-coding-system 'utf-16le-dos)) ;
+(if (eq system-type 'gnu/linux)
+    (set-clipboard-coding-system 'utf-8)) ;
+;; (#1) Using clipboard/copy paste results in chinese looking characters on Linux Mint (search this on Stack Overflow)
+;; Now it works: https://stackoverflow.com/questions/9955725/using-clipboard-copy-paste-results-in-chinese-looking-characters-debian-sid
+                                        ; (set-clipboard-coding-system 'utf-8) ; included by set-selection-coding-system
 (set-keyboard-coding-system 'utf-8) ; configured by prefer-coding-system
 (set-terminal-coding-system 'utf-8) ; configured by prefer-coding-system
 (setq buffer-file-coding-system 'utf-8) ; utf-8-unix
 (setq save-buffer-coding-system 'utf-8) ; nil
 (setq process-coding-system-alist
       (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
+
+;; Disable byte-compile warnings, which I don't care about.
+;; Source: http://tsengf.blogspot.ca/2011/06/disable-byte-compile-warning-in-emacs.html
+(setq byte-compile-warnings '(not nresolved
+                                  free-vars
+                                  callargs
+                                  redefine
+                                  obsolete
+                                  noruntime
+                                  cl-functions
+                                  interactive-only
+                                  ))
+;; Disable startup message
+(setq inhibit-splash-screen t
+      initial-scratch-message nil)
+
+;; Disable the warning when killing a buffer with process
+(setq kill-buffer-query-functions
+  (remq 'process-kill-buffer-query-function
+	kill-buffer-query-functions))
+
+;; Disable the bell
+(setq ring-bell-function 'ignore)
+
+;; Disable abbreviations prompt
+(setq save-abbrevs 'silent)
+
+;; Disable tabs forever and fix indentation offset
+(setq-default indent-tabs-mode nil)
+(setq tab-width 4)
+(defvaralias 'c-basic-offset 'tab-width)
+
+;; Fix scroll
+(setq scroll-step            1
+      scroll-conservatively  10000
+      mouse-wheel-scroll-amount '(1 ((shift) . 1))
+      mouse-wheel-progressive-speed nil
+      mouse-wheel-follow-mouse 't)
+
+
+;; Insert new line without breaking
+(defun insert-new-line-below ()
+  "Add a new line below the current line"
+  (interactive)
+  (let ((oldpos (point)))
+    (end-of-line)
+    (newline-and-indent)))
+
+(global-set-key (kbd "C-o") 'insert-new-line-below)
+
+;; Move buffers around
+(use-package buffer-move
+  :ensure t
+  :bind (("C-c w <up>"    . buf-move-up)
+         ("C-c w <down>"  . buf-move-down)
+         ("C-c w <left>"  . buf-move-left)
+         ("C-c w <right>" . buf-move-right)))
+
+;; More intuitive regions
+;;; This makes the visual region behave more like the contemporary concept of highlighted text, that can be erased or overwritten as a whole.
+;;; Source: https://github.com/DiegoVicen/my-emacs
+(delete-selection-mode t)
+
+;; Define keybindings to eval-buffer on init
+(setq configuration-dir "~/.emacs.d/")
+
+(defun reload-emacs-configuration()
+  "Reload the configuration"
+  (interactive)
+    (load "~/.emacs.d/init.el"))
+
+(defun open-emacs-configuration ()
+  "Open the configuration.org file in buffer"
+  (interactive)
+    (find-file (concat configuration-dir "init.el")))
+
+(global-set-key (kbd "C-c C-b") 'reload-emacs-configuration)
+(global-set-key (kbd "C-c C-o") 'open-emacs-configuration)
+(global-set-key (kbd "M-j") 'mark-word)
+
+;; Useful keybindings
+(unbind-key "C-z")
+(bind-key "C-z" 'undo)
+(bind-key "C-c f" 'find-file)
+(bind-key "C-c C-v" 'revert-buffer)
+(bind-key "C-q" 'kill-buffer)
+(bind-key "M-q" 'query-replace-regexp)
+(bind-key "s-<" 'beginning-of-buffer)
+(bind-key "s->" 'end-of-buffer)
+(bind-key "C-c C-w" 'fill-paragraph)
+
+;; Handle with backup emacs files
+;; Source: https://stackoverflow.com/questions/2680389/how-to-remove-all-files-ending-with-made-by-emacs
+;; https://www.emacswiki.org/emacs/BackupDirectory
+(setq backup-directory-alist
+          `((".*" . ,temporary-file-directory)))
+
+(message "Deleting old backup files...")
+(let ((week (* 60 60 24 7))
+      (current (float-time (current-time))))
+  (dolist (file (directory-files temporary-file-directory t))
+    (when (and (backup-file-name-p file)
+               (> (- current (float-time (nth 5 (file-attributes file))))
+                  week))
+      (message "%s" file)
+      (delete-file file))))
+
+;; How to switch between windows quickly?
+;; Source: https://emacs.stackexchange.com/questions/3458/how-to-switch-between-windows-quickly
+
+(windmove-default-keybindings 'shift)
+
+;; or using ctrl tab for switch buffers 
+(global-set-key (kbd "<C-tab>") 'next-buffer)
+
+
+                                        ;---------------------------;
+                                        ;--- Graphical Interface ---;
+                                        ;---------------------------;
+
+;; Disabling GUI defaults
+(if window-system
+    (progn
+      (toggle-scroll-bar 0)
+      (menu-bar-mode -1)
+      (tool-bar-mode -1)
+      (scroll-bar-mode -1)
+      ;; Maximize Emacs at startup
+      (add-to-list 'default-frame-alist '(fullscreen . maximized))
+      (setq use-default-font-for-symbols nil)
+      (setq inhibit-compacting-font-caches t)))
 
 ;; Quiet Startup
 (defun display-startup-echo-area-message ()
@@ -58,141 +202,73 @@
 (setq inhibit-startup-echo-area-message t)
 (setq initial-scratch-message nil)
 (setq frame-title-format nil)
-(setq ring-bell-function 'ignore)
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; Show path if names are same
-(setq adaptive-fill-regexp "[ t]+|[ t]*([0-9]+.|*+)[ t]*")
-(setq adaptive-fill-first-line-regexp "^* *$")
-(setq sentence-end "\\([。、！？]\\|……\\|[,.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
-(setq sentence-end-double-space nil)
-(setq delete-by-moving-to-trash t)    ; Deleting files go to OS's trash folder
-(setq make-backup-files nil)          ; Forbide to make backup files
-(setq auto-save-default nil)          ; Disable auto save
-(setq set-mark-command-repeat-pop t)  ; Repeating C-SPC after popping mark pops it again
-(setq track-eol t)			; Keep cursor at end of lines.
-(setq line-move-visual nil)		; To be required by track-eol
-(setq-default kill-whole-line t)	; Kill line including '\n'
-(setq-default indent-tabs-mode nil)   ; use space
-(defalias 'yes-or-no-p #'y-or-n-p)
 
+;; Setting default font
+(set-face-attribute 'default nil :font "Fantasque Sans Mono")
+(setq-default line-spacing 0.001)
+(set-face-attribute 'default nil :height 130)
+(set-face-attribute 'default nil :weight 'normal)
 
-                                        ; === Basic editing conf packages ===
-;; Delete selection if insert someting
-(use-package delsel
-  :ensure nil
-  :hook (after-init . delete-selection-mode))
+;; Setting my favorite theme
+(use-package darktooth-theme :ensure t  :config  (load-theme 'darktooth t))
 
-;; Automatically reload files was modified by external program
-(use-package autorevert
-  :ensure nil
-  :diminish
-  :hook (after-init . global-auto-revert-mode))
+;; Set the cursor as a box
+;; Font: https://www.gnu.org/software/emacs/manual/html_node/elisp/Cursor-Parameters.html
+(setq-default cursor-type 'box)
+(set-cursor-color "#ff00ff") 
 
-;; Hungry deletion
-(use-package hungry-delete
-  :diminish
-  :hook (after-init . global-hungry-delete-mode)
-  :config (setq-default hungry-delete-chars-to-skip " \t\f\v"))
-
-(use-package smartparens
-  :hook
-  (after-init . smartparens-global-mode)
-  :config
-  (require 'smartparens-config)
-  (sp-pair "=" "=" :actions '(wrap))
-  (sp-pair "+" "+" :actions '(wrap))
-  (sp-pair "<" ">" :actions '(wrap))
-  (sp-pair "$" "$" :actions '(wrap)))
-
-;; Recent files
-(use-package recentf
-  :ensure nil
-  :hook (after-init . recentf-mode)
-  :bind(("C-c r" . counsel-recentf))
-  :custom
-  (recentf-max-saved-items 20000000)
-  (recentf-auto-cleanup 'never)
-  (recentf-exclude '((expand-file-name package-user-dir)
-                     ".cache"
-                     "cache"
-                     "recentf"
-                     "COMMIT_EDITMSG\\'")))
-
-
-                                        ; === gui basic configuration ===
-
-(if window-system
-    (progn
-      ;; UI parts
-      (toggle-scroll-bar 0)
-      (tool-bar-mode 0)
-      (menu-bar-mode 0)
-      (add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-      (setq use-default-font-for-symbols nil)
-      (setq inhibit-compacting-font-caches t)))
-
-                                        ; === Set font and size ==== ;
-
-(set-face-attribute 'default nil :family "PragmataPro")
-(set-face-attribute 'default nil :height 160)
-
-
+;; Adding icons with all-the-icons
 (use-package all-the-icons
-  :defer t)
-(use-package posframe)
-
-
-
-                                        ; === keybindings ===
-
-;; misc useful keybindings
-(bind-key "C-c C-b" 'eval-buffer)
-(bind-key "C-z" 'undo)
-(bind-key "C-c f" 'find-file)
-(bind-key "C-x e" 'other-frame)
-(bind-key "C-c C-v" 'revert-buffer)
-(bind-key "C-q" 'kill-buffer)
-(bind-key "M-q" 'query-replace-regexp)
-(bind-key "s-<" 'beginning-of-buffer)
-(bind-key "s->" 'end-of-buffer)
-(bind-key "C-c C-w" 'fill-paragraph)
-
-(use-package which-key
-  :diminish which-key-mode
-  :hook (after-init . which-key-mode))
-
-
-                                        ; === Hydra  === 
-
-(use-package hydra)
-
-                                        ; === undo tree ===
-
-(use-package undo-tree
   :ensure t
-  :diminish undo-tree-mode
-  :init
-  (global-undo-tree-mode 1)
-  :config
-  (defalias 'redo 'undo-tree-redo)
-  :bind (("C-z" . undo)     ; Zap to character isn't helpful
-         ("C-S-z" . redo)))
-
-                                        ; === search replace ===
-
-(use-package projectile
-  :diminish
-  :config
-  (projectile-mode +1))
-
-(use-package wgrep
   :defer t
-  :custom
-  (wgrep-enable-key "e")
-  (wgrep-auto-save-buffer t)
-  (wgrep-change-readonly-file t))
+  :config
+  ;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+  ;; you can try setting the following variable:
+  ;; Source: https://github.com/domtronn/all-the-icons.el
+  ;; Source2: https://github.com/domtronn/all-the-icons.el/issues/28
+  (setq inhibit-compacting-font-caches t))
 
+
+                                        ;-------------------------;
+                                        ;--- Desktop save/read ---;
+                                        ;-------------------------;
+
+(desktop-save-mode 1) ;; uses the after-init-hook
+(setq desktop-buffers-not-to-save
+      (concat "\\("
+              "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+              "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
+              "\\)$"))
+(add-to-list 'desktop-modes-not-to-save 'dired-mode)
+(add-to-list 'desktop-modes-not-to-save 'Info-mode)
+(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+
+
+                                        ;--------------------------;
+                                        ;--- Packages and Tools ---;
+                                        ;--------------------------;
+;; Ido everywhere
+(use-package ido
+  :ensure t
+  :config
+  (setq ido-everywhere t)
+  (setq ido-ubiquitous-mode t)
+  (setq ido-create-new-buffer 'always)
+  (setq ido-file-extensions-order '(".org" ".md" ".markdown" ".c" ".h" ".yaml" ".rb" ".html" ".el" ".ini" ".cfg" ".cnf"))
+  (setq ido-enable-flex-matching t)
+  (ido-mode 1))
+
+;; Smex
+(use-package smex
+  :ensure t
+  :init (smex-initialize)
+  :bind
+  ("M-x" . smex))
+
+;; AG (Silver searcher)
 (use-package ag
+  :ensure t
   :custom
   (ag-highligh-search t)
   (ag-reuse-buffers t)
@@ -202,37 +278,72 @@
   :config
   (use-package wgrep-ag))
 
-
-;;; Move paragraphs or text like Sublime Text
-(unless (package-installed-p 'move-text)
-  (package-refresh-contents)
-  (package-install 'move-text))
-
+;; Sublime Text moving paragraphs
 (use-package move-text
+  :ensure t
   :bind
   ("M-<down>" . move-text-down)
   ("M-<up>" . move-text-up))
 
+;; Duplicate things
 (use-package duplicate-thing
+  :ensure t
   :bind ("C-c C-d" . duplicate-thing))
 
+;; Ace window
+(use-package ace-window
+  :ensure t
+  :bind
+  ("C-x o" . ace-select-window))
+  
+;; Dired
+(use-package dired
+  :ensure nil
+  :bind (:map dired-mode-map
+              ("C-c C-p" . wdired-change-to-wdired-mode))
+  :config
+  (setq dired-dwim-target t)
+    ;; Always delete and copy recursively
+  (setq dired-recursive-deletes 'always
+        dired-recursive-copies 'always)
+  :hook (dired-mode . dired-hide-details-mode))
+;; Colourful Dired
+(use-package diredfl
+  :ensure t
+  :init (diredfl-global-mode 1))
 
-                                        ; === Ivy ===
+;; Duplicate this file
+;; source: https://emacs.stackexchange.com/questions/60661/how-to-duplicate-a-file-in-dired
+(defun dired-duplicate-this-file ()
+  "Duplicate file on this line."
+  (interactive)
+  (let* ((this  (dired-get-filename t))
+         (ctr   1)
+         (new   (format "%s[%d]" this ctr)))
+    (while (file-exists-p new)
+      (setq ctr  (1+ ctr)
+            new  (format "%s[%d]" this ctr)))
+     (dired-copy-file this new nil))
+  (revert-buffer))
 
+
+
+;; Ivy
 (use-package ivy
   :ensure t
   :config
   (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "<f6>") 'ivy-resume)
-  :bind (("C-x b" . ivy-switch-buffer)
-         ("C-x B" . ivy-switch-buffer-other-window)))
+  (setq ivy-count-format "%d/%d ")
 
+  :bind (("C-s" . swiper)
+         ("M-i" . counsel-imenu)
+         :map ivy-minibuffer-map
+         ("RET" . ivy-alt-done)
+         ("C-j" . ivy-done)))
 
 (use-package ivy-rich
   :defer 0.1
+  :ensure t
   :preface
   (defun ivy-rich-branch-candidate (candidate)
     "Displays the branch candidate of the candidate for ivy-rich."
@@ -332,6 +443,7 @@
   (ivy-rich-mode 1))
 
 (use-package all-the-icons-ivy
+  :ensure t
   :after (all-the-icons ivy)
   :custom (all-the-icons-ivy-buffer-commands '(ivy-switch-buffer-other-window))
   :config
@@ -340,26 +452,17 @@
   (all-the-icons-ivy-setup))
 
 
-
-                                        ; === Swiper ===
-
-(use-package swiper
-  :after ivy
-  :bind (("C-s" . swiper)
-         :map swiper-map
-         ("M-%" . swiper-query-replace)))
-
-                                        ; === counsel ===
-
+;; Counsel
 (use-package counsel
   :ensure t
   :config
   ;; Enhance fuzzy matching
-  (use-package flx)
+  (use-package flx :ensure t)
   ;; Enhance M-x
-  (use-package amx) ;; https://stackoverflow.com/questions/53026872/m-x-does-not-show-previous-commands
+  (use-package amx :ensure t) ;; https://stackoverflow.com/questions/53026872/m-x-does-not-show-previous-commands
   ;; Ivy integration for Projectile
   (use-package counsel-projectile
+    :ensure t
     :config (counsel-projectile-mode 1))
 
   :config
@@ -376,10 +479,69 @@
   (global-set-key (kbd "C-x l") 'counsel-locate)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 
-                                        ; === anzu === 
+;; iy-go-to-char
+;;; Mimic vim’s f with this function.
+(use-package iy-go-to-char
+  :ensure t
+  :demand t
+  :bind (("M-m" . iy-go-up-to-char)
+         ("M-M" . iy-go-to-char)))
 
-;; https://github.com/syohex/emacs-anzu
+;; projectile
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode 1)
+  (define-key projectile-mode-map (kbd "C-C p") 'projectile-command-map))
+
+;; avy-jump
+(use-package avy
+  :ensure t
+  :bind (("M-SPC" . 'avy-goto-char-timer)
+         ("M-g a" . 'avy-goto-line)))
+
+;; iedit
+;;; This tool allows us to edit all variable names at once just by entering a single keystroke.
+(use-package iedit
+  :ensure t
+  :bind (("C-c i" . iedit-mode)))
+
+;; Recent files
+(use-package recentf
+  :ensure nil
+  :hook (after-init . recentf-mode)
+  :bind(("C-c r" . counsel-recentf))
+  :custom
+  (recentf-max-saved-items 20)
+  (recentf-auto-cleanup 'never)
+  (recentf-exclude '((expand-file-name package-user-dir)
+                     ".cache"
+                     "cache"
+                     "recentf"
+                     "COMMIT_EDITMSG\\'")))
+;; Paren highlighting
+(use-package paren
+  :ensure t
+  :hook
+  (after-init . show-paren-mode)
+  :custom-face
+  (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
+  :custom
+  (show-paren-style 'mixed)
+  (show-paren-when-point-inside-paren t)
+  (show-paren-when-point-in-periphery t))
+
+;; Beacon
+(use-package beacon
+  :ensure t
+  :custom
+  (beacon-color "#f1fa8c")
+  :hook (after-init . beacon-mode))
+
+;; Anzu
+;; Source: https://github.com/syohex/emacs-anzu
 (use-package anzu
+  :ensure t
   :diminish
   :bind
   ("C-r"   . anzu-query-replace-regexp)
@@ -387,303 +549,16 @@
   :hook
   (after-init . global-anzu-mode))
 
-                                        ; === ace-window ===
-
-(use-package ace-window
-  :ensure t
-  :config
-  (global-set-key (kbd "C-c C-w") 'ace-window)
-  (global-set-key [remap other-window] 'ace-window))
-
-                                        ; === mwim === 
-
+;; Mwin
 (use-package mwim
+  :ensure t
   :bind
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
 
-
-                                        ; === company ===
-
-(use-package company
-  :diminish company-mode
-  :ensure t
-  :config
-  ;; using child frame
-  (use-package company-posframe
-    :hook (company-mode . company-posframe-mode))
-  (setq company-idle-delay 0.5)
-  ;; (setq company-show-numbers t)
-  (setq company-tooltip-limit 10)
-  (setq company-minimum-prefix-length 2)
-  (setq company-tooltip-align-annotations t)
-  ;; invert the navigation direction if the the completion popup-isearch-match
-  ;; is displayed on top (happens near the bottom of windows)
-  (setq company-tooltip-flip-when-above t)
-  (global-company-mode))
-
-                                        ; === GIT ===
-
-(use-package git-timemachine
-  :bind ("M-g t" . git-timemachine-toggle))
-
-(use-package diffview
-  :commands (diffview-current diffview-region diffview-message))
-
-(use-package magit
-  :custom
-  (magit-auto-revert-mode nil)
-  :bind
-  ("M-g s" . magit-status))
-
-(use-package gitattributes-mode :defer t)
-(use-package gitconfig-mode :defer t)
-(use-package gitignore-mode :defer t)
-
-(use-package browse-at-remote
-  :bind ("M-g r" . browse-at-remote))
-
-(use-package github-pullrequest)
-
-
-                                        ; === TOOLS ===
-
-(use-package google-translate
-  :bind
-  ("M-o t" . google-translate-at-point)
-  ("M-o T" . google-translate-at-point-reverse)
-  :custom
-  (google-translate-default-source-language "en")
-  (google-translate-default-target-language "ca"))
-
-
-(use-package google-this)
-
-
-                                        ; === LANGUAGES ===
-
-                                        ;=== C/C++ ===
-(defun compile-immediate ()
-  (interactive)
-  (custom-set-variables
-   '(compilation-read-command nil))
-  (call-interactively 'compile))
-
-(use-package cc-mode
-  :commands (cc-mode)
-  :config
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (c-set-offset 'inextern-lang 0)
-              (setq-local c-default-style "K&R")
-              (setq-local indent-tabs-mode nil)
-              (setq-local tab-width 4)
-              (setq-local c-basic-offset 4)))
-
-  (mapc (lambda (map)
-          (bind-key "C-c c" 'compile-immediate map)
-          (bind-key "C-c n" 'next-error map)
-          (bind-key "C-c p" 'previous-error map))
-        (list c-mode-map
-              c++-mode-map)))
-
-
-                                        ; === Javascript ===
-
-(use-package js2-mode
-  :mode ("\\.js\\'" . js2-mode))
-
-
-                                        ; === Web mode ===
-
-;; web-mode: An autonomous emacs major-mode for editing web templates.
-;; http://web-mode.org/
-(use-package web-mode
-  :defer t
-  :init
-  (setq-default
-   web-mode-code-indent-offset 4
-   web-mode-comment-style 4
-   web-mode-css-indent-offset 4
-   web-mode-enable-current-element-highlight t
-   web-mode-enable-current-column-highlight t
-   web-mode-markup-indent-offset 4)
-  :mode
-  ("\\.erb\\'" . web-mode)
-  ("\\.html?\\'" . web-mode)
-  ("\\.tpl\\'" . web-mode))
-
-                                        ; === Markdown ===
-
-(use-package markdown-mode
-  :ensure t
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :custom-face
-  (markdown-header-delimiter-face ((t (:foreground "mediumpurple"))))
-  (markdown-header-face-1 ((t (:foreground "violet" :weight bold :height 1.9))))
-  (markdown-header-face-2 ((t (:foreground "lightslateblue" :weight bold :height 1.6))))
-  (markdown-header-face-3 ((t (:foreground "mediumpurple1" :weight bold :height 1.4))))
-  (markdown-link-face ((t (:background "#0e1014" :foreground "#bd93f9"))))
-  (markdown-list-face ((t (:foreground "mediumpurple"))))
-  (markdown-bold-face ((t (:foreground "Yellow" :weight bold))))
-  (markdown-pre-face ((t (:foreground "#bd98fe"))))  
-  :config
-  (add-hook 'markdown-mode-hook 'auto-fill-mode 'visual-line-mode))
-
-(use-package markdown-mode+
-  :after markdown-mode)
-
-(use-package markdown-toc
-  :ensure t
-  :config
-  (setq markdown-toc-header-toc-title "# Índex"))
-
-
-                                        ; === Pandoc copyit ===
-
-(use-package copyit :ensure t)
-(use-package copyit-pandoc :ensure t)
-
-                                        ; === Olivetti ===
-
-(use-package olivetti
-  :config
-  (setq-default
-   olivetti-hide-mode-line t
-   olivetti-body-width line-width-characters))
-
-                                        ; === Fountain ===
-
-(use-package fountain-mode
-  :config
-
-  (fountain-set-font-lock-decoration 2)
-  (set-face-attribute 'fountain-scene-heading nil :foreground "#202226" :weight 'bold)
-
-  (add-to-list 'auto-mode-alist '("\\.fountain$" . fountain-mode))
-  (add-hook 'fountain-mode-hook (lambda () (turn-on-olivetti-mode)))
-  (defun export-to-pdf ()
-    (shell-command-to-string (format "afterwriting --config afterwriting-config.json --source %s --pdf --overwrite" buffer-file-name)))
-  (add-hook 'after-save-hook #'export-to-pdf))
-
-(use-package yaml-mode
-  :mode ("\\.yaml\\'" "\\.yml\\'")
-  :custom-face
-  (font-lock-variable-name-face ((t (:foreground "violet")))))
-
-
-                                        ; === YAML ===
-
-(use-package yaml-mode
-  :mode ("\\.yaml\\'" "\\.yml\\'")
-  :custom-face
-  (font-lock-variable-name-face ((t (:foreground "violet")))))
-
-
-                                        ; === CUSTOM FUNCTIONS ===
-
-;; source: https://www.emacswiki.org/emacs/TransposeWindows
-(defun transpose-windows (arg)
-  "Transpose the buffers shown in two windows."
-  (interactive "p")
-  (let ((selector (if (>= arg 0) 'next-window 'previous-window)))
-    (while (/= arg 0)
-      (let ((this-win (window-buffer))
-            (next-win (window-buffer (funcall selector))))
-        (set-window-buffer (selected-window) next-win)
-        (set-window-buffer (funcall selector) this-win)
-        (select-window (funcall selector)))
-      (setq arg (if (plusp arg) (1- arg) (1+ arg))))))
-
-
-(defun put-current-path-to-clipboard ()
-    (interactive)
-    (let ((file-path buffer-file-name)
-          (dir-path default-directory))
-      (cond (file-path
-             (kill-new (expand-file-name file-path))
-             (message "This file path is on the clipboard!"))
-            (dir-path
-             (kill-new (expand-file-name dir-path))
-             (message "This directory path is on the clipboard!"))
-            (t
-             (error-message-string "Fail to get path name.")))))
-
-  (defun put-current-filename-to-clipboard ()
-    (interactive)
-    (let ((file-path buffer-file-name)
-          (dir-path default-directory))
-      (cond (file-path
-             (kill-new (file-name-nondirectory file-path))
-             (message "This file path is on the clipboard!"))
-            (dir-path
-             (kill-new (file-name-nondirectory dir-path))
-             (message "This directory path is on the clipboard!"))
-            (t
-             (error-message-string "Fail to get path name.")))))
-
-  (defun put-current-filename-with-line-to-clipboard ()
-    (interactive)
-    (let ((file-path buffer-file-name)
-          (dir-path default-directory))
-      (cond (file-path
-             (kill-new (format "%s:%s"
-                               (file-name-nondirectory file-path)
-                               (count-lines (point-min) (point))))
-             (message "This file path is on the clipboard!"))
-            (dir-path
-             (kill-new (file-name-nondirectory dir-path))
-             (message "This directory path is on the clipboard!"))
-            (t
-             (error-message-string "Fail to get path name.")))))
-
-                                        ; === UI ===
-
-                                        ; === Dashboard ===
-
-(use-package dashboard
-    :diminish
-  (dashboard-mode page-break-lines-mode)
-  :preface
-  (defun my/dashboard-banner ()
-    "Set a dashboard banner including information on package initialization
-  time and garbage collections."""
-    (setq dashboard-banner-logo-title
-          (format "Emacs ready in %.2f seconds with %d garbage collections."
-                  (float-time (time-subtract after-init-time before-init-time)) gcs-done))
-    (setq dashboard-footer "Free Belanche Foundation")
-    (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-                                                   :height 1.1
-                                                   :v-adjust -0.05
-                                                   :face 'font-lock-keyword-face)))
-
-  :config
-  (setq dashboard-startup-banner (concat user-emacs-directory "mriocbot.png"))
-  (dashboard-setup-startup-hook)
-  :custom
-  (dashboard-center-content t)
-  (dashboard-items '((recents . 10)
-                     (projects . 5)
-                     (bookmarks . 5)))
-  :hook ((after-init     . dashboard-refresh-buffer)
-         (dashboard-mode . my/dashboard-banner)))
-
-                                        ; === i-menu-list ===
-(use-package imenu-list
-  :bind
-  ("<f10>" . imenu-list-smart-toggle)
-  :custom-face
-  (imenu-list-entry-face-1 ((t (:foreground "white"))))
-  :custom
-  (imenu-list-focus-after-activation t)
-  (imenu-list-auto-resize t))
-
-                                        ; === neotree ===
-
+;; Neotree
 (use-package neotree
+  :ensure t
   :after
   projectile
   :commands
@@ -730,167 +605,191 @@
           (if file-name
               (neotree-find file-name)))))))
 
+;; https://emacs.stackexchange.com/questions/37678/neotree-window-not-resizable
+(setq neo-window-fixed-size nil)
 
-                                        ; === darktooth-theme
 
-(use-package darktooth-theme
+;; DoReMi
+;; https://www.emacswiki.org/emacs/WindowResize
+(require 'doremi)
+(require 'doremi-cmd)   
+
+
+;; Valid font families are 'material 'wicon 'octicon 'faicon 'fileicon and 'alltheicon
+
+;;(all-the-icons-insert-icons-for 'alltheicon)   ;; Prints all the icons for `alltheicon' font set
+
+;(all-the-icons-insert-icons-for 'octicon 10)   ;; Prints all the icons for the `octicon' family
+                                               ;; and makes the icons height 10
+
+;;(all-the-icons-insert-icons-for 'faicon 1 0.5) ;; Prints all the icons for the `faicon' family
+                                               ;; and also waits 0.5s between printing each one - apache
+
+;; What to display when Emacs starts?
+;; One option is dashboard:
+
+
+(use-package dashboard
   :ensure t
+  :defer nil
+  :diminish
+  (dashboard-mode page-break-lines-mode)
+  :preface
+  (defun create-scratch-buffer ()
+    "Create a scratch buffer"
+    (interactive)
+    (switch-to-buffer (get-buffer-create "*scratch*"))
+    (lisp-interaction-mode))
+  (defun my/dashboard-banner ()
+    "Set a dashboard banner including information on package initialization
+  time and garbage collections."""
+    (setq dashboard-banner-logo-title
+          (format "E M A C S ready in %.2f seconds with %d garbage collections."
+                  (float-time (time-subtract after-init-time before-init-time)) gcs-done))
+    ;(setq dashboard-footer "Gunshow picture #648 by yr friend KC Green") 
+    (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+                                                       :height 1.1
+                                                       :v-adjust -0.05
+                                                       :face 'font-lock-keyword-face)))
+
   :config
-  (load-theme 'darktooth t))
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-init-info nil)
+  ; remove next line and comment the next one if you want to display a logo
+  (setq dashboard-startup-banner (concat user-emacs-directory "rotter_lyud_necrots_inside.png"))
+  ;; (setq dashboard-startup-banner nil)
+  (dashboard-setup-startup-hook)
+  ;;
+  (setq dashboard-set-navigator t)
+  ;; Icons doesnt work on Windows :-/
+  ;; (setq dashboard-navigator-buttons
+  ;;       `(;; line1
+  ;;         ((,(all-the-icons-wicon "tornado" :height 0.9)
+  ;;           "IOC Website"
+  ;;           "Open IOC page on your browser"
+  ;;           (lambda (&rest _) (browse-url "https://ioc.xtec.cat"))
+  ;;           'default)
+  ;;          (,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+  ;;           "Custom Emacs Commands"
+  ;;           "List of useful emacs commands"
+  ;;           (lambda (&rest _) (find-file "~/.emacs.d/myemacs.md"))
+  ;;           'default)
+  ;;          (,(all-the-icons-octicon "pencil" :height 1.1 :v-adjust 0.0)
+  ;;           "Open scratch buffer"
+  ;;           "Switch to the scratch buffer"
+  ;;           (lambda (&rest _) (create-scratch-buffer))
+  ;;           'default)
+  ;;          (,(all-the-icons-fileicon "emacs" :height 1.1 :v-adjust 0.0)
+  ;;           "Open init.el"
+  ;;           "Open Emacs configuration file for easy editing"
+  ;;           (lambda (&rest _) (find-file "~/.emacs.d/init.el"))
+  ;;           'default))))
+  ;;
+  
+  :custom
+  (dashboard-center-content t)
+  (dashboard-items '((recents . 10)
+                     (bookmarks . 6)
+                     (projects . 6)
+                     (agenda . 4)))
+  :hook ((after-init     . dashboard-refresh-buffer)
+         (dashboard-mode . my/dashboard-banner)))
 
-                                        ; === nyan-mode ===
 
-(use-package nyan-mode
-  :if window-system
+
+
+                                        ;-------------------------;
+                                        ;--- Programming Modes ---;
+                                        ;-------------------------;
+
+;; C/C++
+(use-package cc-mode
   :ensure t
+  :commands (cc-mode)
   :config
-  (nyan-mode)
-  (nyan-start-animation))
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (c-set-offset 'inextern-lang 0)
+              (setq-local c-default-style "K&R")
+              (setq-local indent-tabs-mode nil)
+              (setq-local tab-width 4)
+              (setq-local c-basic-offset 4)))
+  (list c-mode-map c++-mode-map))
 
+;; C# - Unity
+;; https://gist.github.com/kurogomapurin/42386006f9aaa7187840
+;; https://joshwolfe.ca/post/emacs-for-csharp/
+;; Compile https://stackoverflow.com/questions/6319274/how-do-i-run-msbuild-from-the-command-line-using-windows-sdk-7-1
 
-                                        ; === dimmer ===
-(use-package dimmer
-  :disabled
+;; Finalment, la millor opció és fer servir el omnisharp-server-install
+;; en el moment de fer l'start ens demanarà el root (on tinguem l'sln.)
+
+(use-package company
+  :ensure t)
+
+(if (eq system-type 'windows-nt)
+    (require 'csharp-mode)
+  (add-hook 'csharp-mode-hook
+            '(lambda()
+               (setq comment-column 40)
+               (setq c-basic-offset 4)
+               (omnisharp-mode)
+               )
+            )
+)
+
+(if (eq system-type 'windows-nt)
+  (use-package omnisharp
+    :after company
+    :config
+    (add-hook 'csharp-mode-hook 'omnisharp-mode)
+    (add-to-list 'company-backends 'company-omnisharp))
+)
+;; (use-package omnisharp
+;;   :ensure t
+;;   :config
+;;   (setq omnisharp-server-executable-path "R:/MyLastSummerCar/tools/omnisharp-server/OmniSharp/bin/Debug/OmniSharp.exe" ))
+
+;; (use-package csharp-mode
+;;   :ensure t
+;;   :mode ("\\.cs$" . csharp-mode)
+;;   :config
+;;   (add-hook 'csharp-mode-hook
+;;             (lambda ()
+;;               (setq-local comment-column 40)
+;;               (setq-local tab-width 4)
+;;               (setq-local c-basic-offset 4)
+;;               (omnisharp-mode))))
+
+;; Git/Magit
+(use-package git-timemachine
+  :ensure t
+  :bind ("M-g t" . git-timemachine-toggle))
+
+(use-package diffview
+  :ensure t
+  :commands (diffview-current diffview-region diffview-message))
+
+(use-package magit
+  :ensure t
   :custom
-  (dimmer-fraction 0.5)
-  (dimmer-exclusion-regexp-list
-       '(".*Minibuf.*"
-         ".*which-key.*"
-         ".*Messages.*"
-         ".*Async.*"
-         ".*Warnings.*"
-         ".*LV.*"
-         ".*Ilist.*"))
-  :config
-  (dimmer-mode t))
-
-
-                                        ; === HIGHLIGTHS ===
-
-(use-package hl-line
-  :ensure nil
-  :hook
-  (after-init . global-hl-line-mode))
-
-
-(use-package paren
-  :ensure nil
-  :hook
-  (after-init . show-paren-mode)
-  :custom-face
-  (show-paren-match ((nil (:background "#44475a" :foreground "#f1fa8c")))) ;; :box t
-  :custom
-  (show-paren-style 'mixed)
-  (show-paren-when-point-inside-paren t)
-  (show-paren-when-point-in-periphery t))
-
-(use-package highlight-symbol
+  (magit-auto-revert-mode nil)
   :bind
-  (:map prog-mode-map
-  ("M-o h" . highlight-symbol)
-  ("M-p" . highlight-symbol-prev)
-  ("M-n" . highlight-symbol-next)))
+  ("M-g s" . magit-status))
 
-(use-package beacon
-  :custom
-  (beacon-color "#f1fa8c")
-  :hook (after-init . beacon-mode))
+(use-package gitattributes-mode :defer t)
+(use-package gitconfig-mode :defer t)
+(use-package gitignore-mode :defer t)
 
-(use-package rainbow-delimiters
-  :hook
-  (prog-mode . rainbow-delimiters-mode))
+(use-package browse-at-remote
+  :bind ("M-g r" . browse-at-remote))
 
-(use-package rainbow-mode
-  :diminish
-  :hook (emacs-lisp-mode . rainbow-mode))
-
-(use-package volatile-highlights
-  :diminish
-  :hook
-  (after-init . volatile-highlights-mode)
-  :custom-face
-  (vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
-
-(use-package highlight-indent-guides
-  :diminish
-  :hook
-  ((prog-mode yaml-mode) . highlight-indent-guides-mode)
-  :custom
-  (highlight-indent-guides-auto-enabled t)
-  (highlight-indent-guides-responsive t)
-  (highlight-indent-guides-method 'character)) ; column
-
-                                        ; === PDF TOOLS  ===
-
-;; http://www.sigmafield.org/2009/10/03/using-doc-view-with-auto-revert-to-view-latex-pdf-output-in-emacs
-(add-hook 'doc-view-mode-hook #'auto-revert-mode)
-
-(use-package pdf-tools
-  ;; https://github.com/zakame/.emacs.d/blob/379dbfe0f10b20f7f43054cd4d13303d8026d105/init.el#L596-L603
-  :if (and (string= system-type 'gnu/linux)
-           (eq (call-process-shell-command "pkg-config" nil nil nil "--exists" "poppler") 0))
-  :commands (pdf-tools-install
-             modi/pdf-tools-re-install)
-  :mode (("\\.pdf\\'" . pdf-view-mode))
-  :config
-  (progn
-    (defvar modi/pdf-tools-bin-directory (let* ((dir-1 (file-name-as-directory (expand-file-name "misc" user-emacs-directory)))
-                                                (dir-2 (file-name-as-directory (expand-file-name "pdf-tools" dir-1)))
-                                                (dir (file-name-as-directory (expand-file-name "bin" dir-2))))
-                                           (make-directory dir :parents)
-                                           dir)
-      "Directory to hold the executable(s) for pdf-tools.")
-
-    (setq-default pdf-view-display-size 'fit-page) ; fit page by default
-    (setq pdf-view-resize-factor 1.10)
-
-    (setq pdf-info-epdfinfo-program (expand-file-name "epdfinfo" modi/pdf-tools-bin-directory))
-
-    ;; https://github.com/politza/pdf-tools/issues/312#issuecomment-329537742
-    ;; Build the program (if necessary) without asking first, if NO-QUERY-P is
-    ;; non-nil.
-    (pdf-tools-install :no-query-p)
-
-    (defun modi/pdf-tools-re-install ()
-      "Re-install `epdfinfo' even if it is installed.
-The re-installation is forced by deleting the existing `epdfinfo'
-binary.
-Useful to run after `pdf-tools' updates."
-      (interactive)
-      (when (pdf-info-running-p)
-        (pdf-info-kill))
-      (delete-file pdf-info-epdfinfo-program)
-      (pdf-tools-install :no-query-p))
-
-    ;; Update `pdf-view-mode-map' bindings
-    (dolist (pair '((beginning-of-buffer . pdf-view-first-page)
-                    (end-of-buffer . pdf-view-last-page)
-                    (modi/scroll-up . pdf-view-next-line-or-next-page)
-                    (modi/scroll-down . pdf-view-previous-line-or-previous-page)))
-      (let ((remap-from (car pair))
-            (remap-to (cdr pair)))
-        (define-key pdf-view-mode-map `[remap ,remap-from] remap-to)))
-
-    (bind-keys
-     :map pdf-view-mode-map
-     ("l" . pdf-history-backward)
-     ("r" . pdf-history-forward))))
+(use-package github-pullrequest :ensure t)
 
 
-                                        ; === C Compiling, debugging, tags ====
-
-                                        ; === gdb ===
-
-(setq
- ;; use gdb-many-windows by default
- gdb-many-windows t
- ;; Non-nil means display source file containing the main routine at startup
- gdb-show-main t
- )
-
-
-                                        ; === ggtags ====
 ;; GNU Global Tags
+;; download this pack for windows: http://adoxa.altervista.org/global/
 (use-package ggtags
   :ensure t
   :commands ggtags-mode
@@ -907,32 +806,329 @@ Useful to run after `pdf-tools' updates."
                 (when (derived-mode-p 'c-mode 'c++-mode 'asm-mode)
                   (ggtags-mode 1)))))
 
+                                         ;---------------------;
+                                         ;--- Smart Parents ---;
+                                         ;---------------------;
 
-                                        ; === MISC ===
+;; Source: https://ebzzry.io/en/emacs-pairs/ 
+(use-package smartparens-config
+  :ensure smartparens
+  :config (progn (show-smartparens-global-mode t)))
 
-;;; Warnings, Alerts and other special keywords in comments
-;; from Casey Muratori
-(setq fixme-modes '(c-mode js2-mode yaml-mode sgml-mode fountain-mode markdown-mode))
-(make-face 'font-lock-fixme-face)
-(make-face 'font-lock-note-face)
-(make-face 'font-lock-done-face)
-(make-face 'font-lock-alert-face)
-(make-face 'font-lock-hack-face)
-(mapc (lambda (mode)
-        (font-lock-add-keywords
-         mode
-         '(("\\<\\(TODO\\):" 1 'font-lock-fixme-face t)
-           ("\\<\\(NOTE\\):" 1 'font-lock-note-face t)
-           ("\\<\\(HACK\\):" 1 'font-lock-alert-face t)
-           ("\\<\\(DONE\\):" 1 'font-lock-done-face t)
-           ("\\<\\(FIXME\\):" 1 'font-lock-hack-face t)
-	   ("\\<\\(ALERT\\):" 1 'font-lock-alert-face t))))
-      fixme-modes)
-(modify-face 'font-lock-fixme-face "magenta" nil nil t nil t nil nil)
-(modify-face 'font-lock-note-face "cyan" nil nil t nil t nil nil)
-(modify-face 'font-lock-done-face "green" nil nil t nil t nil nil)
-(modify-face 'font-lock-alert-face "OrangeRed" nil nil t nil t nil nil)
-(modify-face 'font-lock-hack-face "gold" nil nil t nil t nil nil)
+(add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+(add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
+(add-hook 'js2-mode-hook #'smartparens-mode)
 
 
-                                        ;=== END OF init.el ===
+
+                                         ;------------------------;
+                                         ;--- Web debvelopment ---;
+                                         ;------------------------;
+
+(use-package web-mode
+  :ensure t
+  :mode ("\\.html$" . web-mode)
+  :init
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq js-indent-level 2)
+  (setq web-mode-enable-auto-pairing t)
+  (setq web-mode-enable-auto-expanding t)
+  (setq web-mode-enable-css-colorization t))
+
+(use-package web-beautify
+  :ensure t
+  :commands (web-beautify-css
+             web-beautify-css-buffer
+             web-beautify-html
+             web-beautify-html-buffer
+             web-beautify-js
+             web-beautify-js-buffer))
+
+(use-package emmet-mode
+  :ensure t
+  :diminish (emmet-mode . "ε")
+  :bind* (("C-)" . emmet-next-edit-point)
+          ("C-(" . emmet-prev-edit-point))
+  :commands (emmet-mode
+             emmet-next-edit-point
+             emmet-prev-edit-point)
+  :init
+  (setq emmet-indentation 2)
+  (setq emmet-move-cursor-between-quotes t)
+  :config
+  ;; Auto-start on any markup modes
+  (add-hook 'sgml-mode-hook 'emmet-mode)
+  (add-hook 'web-mode-hook 'emmet-mode))
+
+;; https://emacs.cafe/emacs/javascript/setup/2017/04/23/emacs-setup-javascript.html
+(use-package js2-mode :ensure t)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+;; Better imenu
+(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+(use-package js2-refactor :ensure t)
+(use-package xref-js2 :ensure t)
+
+(add-hook 'js2-mode-hook #'js2-refactor-mode)
+(js2r-add-keybindings-with-prefix "C-c C-r")
+(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+;; unbind it.
+(define-key js-mode-map (kbd "M-.") nil)
+
+(add-hook 'js2-mode-hook (lambda ()
+  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+  (add-hook 'web-mode-hook 'electric-pair-mode)
+
+                                        ;-------------------------;
+                                        ;--- Other Major Modes ---;
+                                        ;-------------------------;
+
+(use-package markdown-mode
+  :ensure t
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :custom-face
+  (markdown-header-delimiter-face ((t (:foreground "mediumpurple"))))
+  (markdown-header-face-1 ((t (:foreground "violet" :weight bold))))
+  (markdown-header-face-2 ((t (:foreground "lightslateblue" :weight bold))))
+  (markdown-header-face-3 ((t (:foreground "mediumpurple1" :weight bold))))
+  (markdown-link-face ((t (:background "#0e1014" :foreground "#bd93f9"))))
+  (markdown-list-face ((t (:foreground "mediumpurple"))))
+  (markdown-bold-face ((t (:foreground "Yellow" :weight bold))))
+  (markdown-pre-face ((t (:foreground "#bd98fe"))))  
+  :hook (markdown-mode . visual-line-mode))
+
+(use-package olivetti
+  :ensure t
+  :config
+  (setq-default
+   olivetti-hide-mode-line t
+   olivetti-body-width 80))
+
+(use-package fountain-mode
+  :ensure t
+  :config
+  ;; @BUG?
+  ;; Error (use-package): fountain-mode/:config: Symbol’s function definition is void: fountain-set-font-lock-decoration
+  ;; (fountain-set-font-lock-decoration 2)
+  (set-face-attribute 'fountain-scene-heading nil :foreground "#202226" :weight 'bold)
+  (add-to-list 'auto-mode-alist '("\\.fountain$" . fountain-mode))
+  (add-hook 'fountain-mode-hook (lambda () (turn-on-olivetti-mode)))
+  (defun export-to-pdf ()
+    (shell-command-to-string (format "afterwriting --config afterwriting-config.json --source %s --pdf --overwrite" buffer-file-name)))
+  (add-hook 'after-save-hook #'export-to-pdf))
+
+(use-package yaml-mode
+  :ensure t
+  :mode ("\\.yaml\\'" "\\.yml\\'")
+  :custom-face
+  (font-lock-variable-name-face ((t (:foreground "violet")))))
+
+(use-package pdf-tools
+  :ensure t
+  :demand t
+  :config
+  (pdf-tools-install t)
+  (setq pdf-annot-activate-created-annotations t)
+  :bind (:map pdf-view-mode-map
+              ("C-s" . isearch-forward)
+              ("h" . pdf-annot-add-highlight-markup-annotation)
+              ("t" . pdf-annot-add-text-annotation)
+              ("D" . pdf-annot-delete)))
+
+                                        ;--------------------;
+                                        ;--- Localization ---;
+                                        ;--------------------;
+
+;; Rellotge format 24 hores
+(setq display-time-day-and-date t
+display-time-24hr-format t)
+(display-time)
+;
+;; Posar en català el calendari
+;; Font: https://www.emacswiki.org/emacs/CalendarLocalization#toc4
+(setq european-calendar-style 't)
+(setq
+    calendar-week-start-day 1
+    calendar-day-name-array ["dg" "dll" "dm" "dx" "dj" "dv" "ds"]
+    calendar-month-name-array ["gener" "febrer" "març" "abril" "maig" "juny" "juliol" "agost" "setembre" "octubre" "novembre" "desembre"]
+   )
+                                         ;-----------;
+                                         ;--- ORG ---;
+                                         ;-----------;
+
+
+(use-package org
+  :ensure t
+  :ensure org-plus-contrib)
+
+(add-hook 'org-mode-hook 'auto-fill-mode)
+(setq-default fill-column 79)
+
+(setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)" "DROP(x!)"))
+      org-log-into-drawer t)
+
+(setq org-src-tab-acts-natively t)
+
+(defun my/fix-inline-images ()
+  (when org-inline-image-overlays
+    (org-redisplay-inline-images)))
+
+(add-hook 'org-babel-after-execute-hook 'my/fix-inline-images)
+(setq-default org-image-actual-width 620)
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode)))
+  (setq org-bullets-bullet-list
+        '("◉" "◎" "○" "○" "○" "○")))
+(setq org-hide-leading-stars t)
+
+(setq-default org-display-custom-times t)
+(setq org-time-stamp-custom-formats 
+  '("<%a %d %b %Y" . "<%a %d %b %Y %H:%M>"))
+
+                                        ;---------------;
+                                        ;--- ERC/IRC ---;
+                                        ;---------------;
+
+
+;; utf-8 always and forever
+(setq erc-server-coding-system '(utf-8 . utf-8))
+;; auto identify
+(setq erc-prompt-for-nickserv-password nil)
+
+(use-package erc
+  :custom-face
+  (erc-action-face ((t (:foreground "#8fbcbb"))))
+  (erc-error-face ((t (:foreground "#bf616a"))))
+  (erc-input-face ((t (:foreground "#ebcb8b"))))
+  (erc-notice-face ((t (:foreground "#ebcb8b"))))
+  (erc-timestamp-face ((t (:foreground "#a3be8c"))))
+  :custom
+  (erc-fill-function 'erc-fill-static)
+  (erc-fill-static-center 22)
+  (erc-header-line-format "%n on %t (%m)")
+  (erc-join-buffer 'bury)
+  (erc-kill-buffer-on-part t)
+  (erc-kill-queries-on-quit t)
+  (erc-kill-server-buffer-on-quit t)
+  (erc-lurker-threshold-time 43200)
+  (erc-server-reconnect-attempts 5)
+  (erc-server-reconnect-timeout 3))
+;; Thanks to https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources
+;; Reddit question: https://www.reddit.com/r/emacs/comments/ekhr95/ircerc_twitch_setup/
+;;(setq auth-source-debug t)
+
+;; remember you need to create .authinfo.gpg
+;; and then gpg -c .authinfo
+;; need to verify if that works with Linux
+;; Twitch function
+(defun twitch-start-irc ()
+  "Connect to Twitch IRC."
+  (setq auth-sources '((:source "~/.emacs.d/secrets/.authinfo.gpg")))
+  (auth-source-search :host "irc.chat.twitch.tv" :max 1)
+  (interactive)
+  (when (y-or-n-p "Do you want to start Twitch's IRC? ")
+    (erc-tls :server "irc.chat.twitch.tv" :port 6697 :nick "rotterchonsy")))
+
+                                        ;--------------;
+                                        ;--- ESHELL ---;
+                                        ;--------------;
+
+;; Source: https://github.com/snackon/Witchmacs/blob/master/config.org 
+
+(setq eshell-prompt-regexp "^[^αλ\n]*[αλ] ")
+(setq eshell-prompt-function
+      (lambda nil
+        (concat
+         (if (string= (eshell/pwd) (getenv "HOME"))
+             (propertize "~" 'face `(:foreground "#99CCFF"))
+           (replace-regexp-in-string
+            (getenv "HOME")
+            (propertize "~" 'face `(:foreground "#99CCFF"))
+            (propertize (eshell/pwd) 'face `(:foreground "#99CCFF"))))
+         (if (= (user-uid) 0)
+             (propertize " α " 'face `(:foreground "#FF6666"))
+         (propertize " λ " 'face `(:foreground "#A6E22E"))))))
+
+(setq eshell-highlight-prompt nil)
+
+(defalias 'open 'find-file-other-window)
+(defalias 'clean 'eshell/clear-scrollback)
+
+(defun eshell/sudo-open (filename)
+  "Open a file as root in Eshell."
+  (let ((qual-filename (if (string-match "^/" filename)
+                           filename
+                         (concat (expand-file-name (eshell/pwd)) "/" filename))))
+    (switch-to-buffer
+     (find-file-noselect
+      (concat "/sudo::" qual-filename)))))
+
+(defun eshell-other-window ()
+  "Create or visit an eshell buffer."
+  (interactive)
+  (if (not (get-buffer "*eshell*"))
+      (progn
+        (split-window-sensibly (selected-window))
+        (other-window 1)
+        (eshell))
+    (switch-to-buffer-other-window "*eshell*")))
+
+(global-set-key (kbd "C-c RET") 'eshell-other-window)
+
+                                        ;-----------------------------------;
+                                        ;--- Insert time stamp functions ---;
+                                        ;-----------------------------------;
+
+;; Source:
+;; https://stackoverflow.com/questions/251908/how-can-i-insert-current-date-and-time-into-a-file-using-emacs
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-Parsing.html
+(defun now ()
+  "Insert string for the current time formatted like '2:34 PM'."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "(%A %d/%m/%Y %-H:%M)")))
+
+(defun today ()
+  "Insert string for today's date nicely formatted in American style,
+e.g. Sunday, September 17, 2000."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "%A, %B %e, %Y")))
+
+                                        ;-------------------------;
+                                        ;--- Persisten scratch ---;
+                                        ;-------------------------;
+
+
+;; Source:
+;; https://github.com/Fanael/persistent-scratch
+(use-package persistent-scratch
+  :ensure t
+  :config
+  (persistent-scratch-setup-default))
+
+                                        ;-----------------------------------;
+                                        ;--- Path filename to clipboard  ---;
+                                        ;-----------------------------------;
+
+(defun copy-file-path-on-clipboard ()
+  "Put the current file name on the clipboard"
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (with-temp-buffer
+        (insert filename)
+        (clipboard-kill-region (point-min) (point-max)))
+      (message filename))))
+
+
+;; --- end of init.el
