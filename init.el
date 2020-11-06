@@ -307,6 +307,7 @@
   (setq dired-recursive-deletes 'always
         dired-recursive-copies 'always)
   :hook (dired-mode . dired-hide-details-mode))
+
 ;; Colourful Dired
 (use-package diredfl
   :ensure t
@@ -492,6 +493,7 @@
   :ensure t
   :config
   (projectile-global-mode 1)
+  (setq projectile-indexing-method 'hybrid)
   (define-key projectile-mode-map (kbd "C-C p") 'projectile-command-map))
 
 ;; avy-jump
@@ -512,6 +514,7 @@
   :hook (after-init . recentf-mode)
   :bind(("C-c r" . counsel-recentf))
   :custom
+  (recentf-keep '(file-remote-p file-readable-p))
   (recentf-max-saved-items 20)
   (recentf-auto-cleanup 'never)
   (recentf-exclude '((expand-file-name package-user-dir)
@@ -532,10 +535,12 @@
   (show-paren-when-point-in-periphery t))
 
 ;; Beacon
+;; Highlighting cursor when switching between windows
 (use-package beacon
   :ensure t
   :custom
-  (beacon-color "#f1fa8c")
+  (beacon-color "#ffffff")
+  ;; (beacon-color "#f1fa8c")
   :hook (after-init . beacon-mode))
 
 ;; Anzu
@@ -815,9 +820,9 @@
   :ensure smartparens
   :config (progn (show-smartparens-global-mode t)))
 
-(add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
-(add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
-(add-hook 'js2-mode-hook #'smartparens-mode)
+;; (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+;; (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
+;; (add-hook 'js2-mode-hook #'smartparens-mode)
 
 
 
