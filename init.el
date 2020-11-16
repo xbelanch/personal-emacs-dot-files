@@ -30,6 +30,10 @@
 ;; http://ergoemacs.org/emacs/emacs_installing_packages.html
 (add-to-list 'load-path "~/.emacs.d/elisp/")
 
+;; Auto-refresh all buffers when files have changed on disk
+;; from: https://stackoverflow.com/questions/1480572/how-to-have-emacs-auto-refresh-all-buffers-when-files-have-changed-on-disk
+(global-auto-revert-mode t)
+
 ;; Disable yes-or-no messages
 (defalias 'yes-or-no-p #'y-or-n-p)
 
@@ -215,7 +219,7 @@
 ;; Set the cursor as a box
 ;; Font: https://www.gnu.org/software/emacs/manual/html_node/elisp/Cursor-Parameters.html
 (setq-default cursor-type 'box)
-(set-cursor-color "#ff00ff") 
+(set-cursor-color "#ffff00") 
 
 ;; Adding icons with all-the-icons
 (use-package all-the-icons
@@ -536,12 +540,12 @@
 
 ;; Beacon
 ;; Highlighting cursor when switching between windows
-(use-package beacon
-  :ensure t
-  :custom
-  (beacon-color "#ffffff")
-  ;; (beacon-color "#f1fa8c")
-  :hook (after-init . beacon-mode))
+;; (use-package beacon
+;;   :ensure t
+;;   :custom
+;;   (beacon-color "#ffffff")
+;;   ;; (beacon-color "#f1fa8c")
+;;   :hook (after-init . beacon-mode))
 
 ;; Anzu
 ;; Source: https://github.com/syohex/emacs-anzu
