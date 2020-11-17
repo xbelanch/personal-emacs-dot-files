@@ -167,9 +167,27 @@
 
 (use-package restart-emacs)
 
-                                        ;-----------;
-                                        ;--- GUI ---;
-                                        ;-----------;
+                                        ;--------------------;
+                                        ;--- GUI / Window ---;
+                                        ;--------------------;
+
+;; Most of the time, when I open a new window with C-x 2 or C-x 3 it is to switch directly to it and perform an action. By default, GNU Emacs does not give focus to the new window created. I have no idea why this is not the default behavior. But let's refine these keys:
+(use-package window
+  :ensure nil
+  :bind (("C-x 3" . hsplit-last-buffer)
+         ("C-x 2" . vsplit-last-buffer))
+  :preface
+  (defun hsplit-last-buffer ()
+    "Gives the focus to the last created horizontal window."
+    (interactive)
+    (split-window-horizontally)
+    (other-window 1))
+
+  (defun vsplit-last-buffer ()
+    "Gives the focus to the last created vertical window."
+    (interactive)
+    (split-window-vertically)
+    (other-window 1)))
 
 ;; Disabling GUI defaults
 (use-package scroll-bar
@@ -208,6 +226,8 @@
 
 
 
+
+
                                         ;-----------------------;
                                         ;--- Fonts and Icons ---;
                                         ;-----------------------;
@@ -216,7 +236,7 @@
           (lambda ()
             (when (member "Fantasque Sans Mono" (font-family-list))
               (set-face-attribute 'default nil :font "Fantasque Sans Mono")
-              (set-face-attribute 'default nil :height 130)
+              (set-face-attribute 'default nil :height 140)
               (set-face-attribute 'default nil :weight 'normal))))
 
 
@@ -279,7 +299,7 @@
   (dashboard-navigator-buttons
    `(
      ((,(and (display-graphic-p)
-             (all-the-icons-faicon "gitlab" :height 1.2 :v-adjust -0.1))
+             (all-the-icons-faicon "github" :height 1.2 :v-adjust -0.1))
        "Homepage"
        "Browse Homepage"
        (lambda (&rest _) (browse-url homepage)))
@@ -307,7 +327,8 @@
 
   (setq dashboard-items '((packages)
                           (projects . 10)
-                          (recents . 3)))
+                          (recents . 5)
+                          (agenda . 5)))
   (dashboard-setup-startup-hook))
 
 
@@ -557,7 +578,7 @@
   :diminish git-gutter-mode
   :custom
   (git-gutter:hide-gutter t)
-  (git-gutter:update-interval 0.1)
+  (git-gutter:update-interval 0.5)
   (git-gutter:verbosity 0))
 
 (use-package gitignore-mode)
@@ -571,181 +592,271 @@
 (use-package magit
   :bind ("C-x g" . magit-status))
 
+                                        ;--------------------------------------;
+                                        ;--- Markdown / Olivetti / Fountain ---;
+                                        ;--------------------------------------;
 
-;; ;;; module-markdown.el --- markdown integration
+(use-package markdown-mode
+  :mode (("\\.m[ark]*d[own]*" . gfm-mode))
+  :custom
+  (markdown-indent-on-enter nil))
 
-;; (use-package markdown-mode
-;;   :mode (("\\.m[ark]*d[own]*" . gfm-mode))
-;;   :custom
-;;   (markdown-indent-on-enter nil))
+(use-package olivetti
+  :ensure t
+  :config
+  (setq-default
+   olivetti-hide-mode-line t
+   olivetti-body-width 80))
 
-;; (use-package grip-mode
-;;   :bind (:map markdown-mode-command-map
-;;               ("g" . grip-mode))
-;;   :custom
-;;   (grip-update-after-change nil)
-;;   (grip-preview-use-webkit nil))
-
-;; (use-package markdown-toc
-;;   :hook (before-save . markdown-toc-refresh-toc)
-;;   :bind (:map markdown-mode-map
-;;               ("C-c i" . markdown-toc-generate-or-refresh-toc)
-;;               ("C-c r" . markdown-toc-refresh-toc)))
-
-;; (provide 'module-markdown)
-;; ;;; module-markdown.el ends here
-
-;; ;;; Olivetti
-;; (use-package olivetti
-;;   :ensure t
-;;   :config
-;;   (setq-default
-;;    olivetti-hide-mode-line t
-;;    olivetti-body-width 80))
+(use-package fountain-mode
+  :ensure t
+  :config
+  (set-face-attribute 'fountain-scene-heading nil :foreground "#202226" :weight 'bold)
+  (add-to-list 'auto-mode-alist '("\\.fountain$" . fountain-mode))
+  (add-hook 'fountain-mode-hook (lambda () (turn-on-olivetti-mode)))
+  (defun export-to-pdf ()
+    (shell-command-to-string (format "afterwriting --config afterwriting-config.json --source %s --pdf --overwrite" buffer-file-name)))
+  (add-hook 'after-save-hook #'export-to-pdf))
 
 
-;; ;; Anzu
-;; ;; Source: https://github.com/syohex/emacs-anzu
-;; (use-package anzu
-;;   :ensure t
-;;   :diminish
-;;   :bind
-;;   ("C-r"   . anzu-query-replace-regexp)
-;;   ("C-M-r" . anzu-query-replace-at-cursor-thing)
-;;   :hook
-;;   (after-init . global-anzu-mode))
+                                        ;-------------------------------;
+                                        ;--- Text manipulation extras---;
+                                        ;-------------------------------;
 
-;; ;;; module-text.el --- Text manipulation extras
-;; (use-package move-text
-;;   :bind (("M-<up>" . move-text-up)
-;;          ("M-<down>" . move-text-down)))
+(use-package move-text
+  :bind (("M-<up>" . move-text-up)
+         ("M-<down>" . move-text-down)))
 
-;; (global-set-key (kbd "M-u") 'upcase-dwim)
-;; (global-set-key (kbd "M-l") 'downcase-dwim)
+;; Upcase and downcase
+(global-set-key (kbd "M-u") 'upcase-dwim)
+(global-set-key (kbd "M-l") 'downcase-dwim)
 
-;; (provide 'module-text)
-;; ;;; module-text.el ends here
+;; Anzu
+;; Source: https://github.com/syohex/emacs-anzu
+(use-package anzu
+  :ensure t
+  :diminish
+  :bind
+  ("C-r"   . anzu-query-replace-regexp)
+  ("C-M-r" . anzu-query-replace-at-cursor-thing)
+  :hook
+  (after-init . global-anzu-mode))
 
-;; ;;; module-web.el --- web integration
+;; Duplicate things
+(use-package duplicate-thing
+  :ensure t
+  :bind ("C-c C-d" . duplicate-thing))
 
-;; (use-package web-mode
-;;   :mode ("\\.html?\\'" "\\.css?\\'")
-;;   :custom
-;;   (web-mode-code-indent-offset 2)
-;;   (web-mode-css-indent-offset 2)
-;;   (web-mode-markup-indent-offset 2)
-;;   (web-mode-script-padding 2)
-;;   (web-mode-enable-auto-pairing t)
-;;   (web-mode-enable-current-element-highlight t)
-;;   (web-mode-enable-current-column-highlight t)
-;;   :custom-face
-;;   (web-mode-html-tag-bracket-face ((nil (:foreground "Snow3"))))
-;;   (web-mode-current-element-highlight-face ((nil (:background "#073642")))))
+;; avy-jump
+(use-package avy
+  :ensure t
+  :bind (("M-SPC" . 'avy-goto-char-timer)
+         ("M-g a" . 'avy-goto-line)))
 
-;; (use-package emmet-mode
-;;   :after (web-mode)
-;;   :hook (web-mode . emmet-mode))
+                                        ;-------------;
+                                        ;--- Dired ---;
+                                        ;-------------;
 
-;; (provide 'module-web)
-;; ;;; module-web.el ends here
+(use-package dired
+  :ensure nil
+  :delight "Dired "
+  :custom
+  (dired-auto-revert-buffer t)
+  (dired-dwim-target t)
+  (dired-hide-details-hide-symlink-targets nil)
+  (dired-listing-switches "-alh")
+  (dired-ls-F-marks-symlinks nil)
+  (dired-recursive-copies 'always))
+
+;; Duplicate this file
+;; source: https://emacs.stackexchange.com/questions/60661/how-to-duplicate-a-file-in-dired
+(defun dired-duplicate-this-file ()
+  "Duplicate file on this line."
+  (interactive)
+  (let* ((this  (dired-get-filename t))
+         (ctr   1)
+         (new   (format "%s[%d]" this ctr)))
+    (while (file-exists-p new)
+      (setq ctr  (1+ ctr)
+            new  (format "%s[%d]" this ctr)))
+     (dired-copy-file this new nil))
+  (revert-buffer))
+
+(use-package dired-narrow
+  :bind (("C-c C-n" . dired-narrow)
+         ("C-c C-f" . dired-narrow-fuzzy)
+         ("C-c C-r" . dired-narrow-regexp)))
+
+(use-package dired-subtree
+  :bind (:map dired-mode-map
+              ("<backtab>" . dired-subtree-cycle)
+              ("<tab>" . dired-subtree-toggle)))
+
+(use-package diredfl
+  :init (diredfl-global-mode 1))
+
+;-----------;
+;--- ORG ---;
+;-----------;
+
+(use-package org
+  :custom
+  (org-log-done t))
+
+(setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)" "DROP(x!)"))
+      org-log-into-drawer t)
+
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
+
+(setq-default org-display-custom-times t)
+(setq org-time-stamp-custom-formats
+  '("<%a %d %b %Y" . "<%a %d %b %Y %H:%M>"))
+
+;----------------------;
+; --- Miscellaneous ---;
+;----------------------;
+
+(use-package smart-comment
+  :bind ("M-;" . smart-comment))
+
+;; --- Useful keybindings
+(unbind-key "C-z")
+(bind-key "C-z" 'undo)
+(bind-key "C-q" 'kill-this-buffer)
+
+;; Set the cursor as a box
+;; Font: https://www.gnu.org/software/emacs/manual/html_node/elisp/Cursor-Parameters.html
+(set-cursor-color "#ffff00")
+
+                                        ;-------------------;
+                                        ;--- Programming ---;
+                                        ;-------------------;
+
+                                        ;--- Web development ---;
+
+(use-package web-mode
+  :mode ("\\.html?\\'" "\\.css?\\'")
+  :custom
+  (web-mode-code-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-markup-indent-offset 2)
+  (web-mode-script-padding 2)
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-current-column-highlight t)
+  :custom-face
+  (web-mode-html-tag-bracket-face ((nil (:foreground "Snow3"))))
+  (web-mode-current-element-highlight-face ((nil (:background "#073642")))))
+
+(use-package emmet-mode
+  :after (web-mode)
+  :hook (web-mode . emmet-mode))
+
+;; @TODO: Need to review that:
+;; src: https://github.com/rememberYou/.emacs.d/blob/master/config.org#javascript
+;; For my JavaScript configuration, I took my sources from the Nicolas Pettons blog which I found very well explained.
+;;Setting up Emacs for JavaScript (part #1) Setting up Emacs for JavaScript (part #2)
+;;I like to use prettier to get my TypeScript code clean. To use it, dont forget to install it with your package manager.
+
+(use-package prettier-js
+  :delight
+  :custom (prettier-js-args '("--print-width" "100"
+                              "--single-quote" "true"
+                              "--trailing-comma" "all")))
+
+;; By default, GNU Emacs uses js-mode as major mode for JavaScript buffers and I prefer use js2-mode instead because of his abilities to parses buffers and builds an AST for things like syntax highlighting.
+(use-package js2-mode
+  :hook ((js2-mode . js2-imenu-extras-mode)
+         (js2-mode . prettier-js-mode))
+  :mode "\\.js\\'"
+  :custom (js-indent-level 2))
+
+;; Makes it easy to jump to function references or definitions.
+(use-package xref-js2 :defer 5)
 
 
-;; ;;; module-org.el --- org-mode
-;; (use-package org
-;;   :custom
-;;   (org-log-done t))
+                                        ;--- JSON ---;
 
-;;  (use-package org-bullets
-;;     :ensure t
-;;         :init
-;;         (add-hook 'org-mode-hook (lambda ()
-;;                             (org-bullets-mode 1))))
+(use-package json-mode
+  :custom
+  (js-indent-level 2))
 
-;; (setq org-hide-leading-stars t)
+(use-package jsonnet-mode)
 
-;; (setq-default org-display-custom-times t)
-;; (setq org-time-stamp-custom-formats
-;;   '("<%a %d %b %Y" . "<%a %d %b %Y %H:%M>"))
+                                        ;--- YAML ---;
 
-
-;; (provide 'module-org)
-;; ;;; module-org.el ends here
+(use-package yaml-mode
+  ; repo: https://github.com/yoshiki/yaml-mode
+  :mode (("\\.yml$" .  yaml-mode)
+         ("\\.yaml$" . yaml-mode))
+  :bind (("C-m" . newline-and-indent)))
 
 
-;; ;;; module-json.el --- json integration
+                                        ;--------------------;
+                                        ;--- Localization ---;
+                                        ;--------------------;
 
-;; (use-package json-mode
-;;   :custom
-;;   (js-indent-level 2))
-
-;; (use-package jsonnet-mode)
-
-;; (provide 'module-json)
-;; ;;; module-json.el ends here
-
-;; ;;; module-yaml.el --- yaml integration
-
-;; (use-package yaml-mode
-;;   ; repo: https://github.com/yoshiki/yaml-mode
-;;   :mode (("\\.yml$" .  yaml-mode)
-;;          ("\\.yaml$" . yaml-mode))
-;;   :bind (("C-m" . newline-and-indent)))
-
-;; (use-package gitlab-ci-mode)
-
-;; (provide 'module-yaml)
-;; ;;; module-yaml.el ends here
+;; Rellotge format 24 hores
+(setq display-time-day-and-date t
+display-time-24hr-format t)
+(display-time)
+;
+;; Posar en català el calendari
+;; Font: https://www.emacswiki.org/emacs/CalendarLocalization#toc4
+(setq european-calendar-style 't)
+(setq
+    calendar-week-start-day 1
+    calendar-day-name-array ["dg" "dll" "dm" "dx" "dj" "dv" "ds"]
+    calendar-month-name-array ["gener" "febrer" "març" "abril" "maig" "juny" "juliol" "agost" "setembre" "octubre" "novembre" "desembre"]
+   )
 
 
-;; ;;; module-misc.el -- miscellaneous
-;; (use-package smart-comment
-;;   :bind ("M-;" . smart-comment))
 
-;; ;;; --- Useful keybindings
-;; (unbind-key "C-z")
-;; (bind-key "C-z" 'undo)
-;; (bind-key "C-q" 'kill-this-buffer)
+                                        ;-----------------------------------;
+                                        ;--- Insert time stamp functions ---;
+                                        ;-----------------------------------;
+
+;; Source:
+;; https://stackoverflow.com/questions/251908/how-can-i-insert-current-date-and-time-into-a-file-using-emacs
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-Parsing.html
+(defun now ()
+  "Insert string for the current time formatted like '2:34 PM'."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "(%A %d/%m/%Y %-H:%M)")))
+
+(defun today ()
+  "Insert string for today's date nicely formatted in American style,
+e.g. Sunday, September 17, 2000."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "%A, %B %e, %Y")))
+
+                                        ;-------------------------;
+                                        ;--- Persisten scratch ---;
+                                        ;-------------------------;
 
 
-;; ;; Set the cursor as a box
-;; ;; Font: https://www.gnu.org/software/emacs/manual/html_node/elisp/Cursor-Parameters.html
-;; (setq-default cursor-type 'box)
-;; (set-cursor-color "#ffff00")
+;; Source:
+;; https://github.com/Fanael/persistent-scratch
+(use-package persistent-scratch
+  :ensure t
+  :config
+  (persistent-scratch-setup-default))
 
+                                        ;-----------------------------------;
+                                        ;--- Path filename to clipboard  ---;
+                                        ;-----------------------------------;
 
-;; ;; Colourful Dired
-;; (use-package diredfl
-;;   :ensure t
-;;   :init (diredfl-global-mode 1))
+(defun copy-file-path-on-clipboard ()
+  "Put the current file name on the clipboard"
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (with-temp-buffer
+        (insert filename)
+        (clipboard-kill-region (point-min) (point-max)))
+      (message filename))))
 
-
-;;                                         ;--------------------;
-;;                                         ;--- Localization ---;
-;;                                         ;--------------------;
-
-;; ;; Rellotge format 24 hores
-;; (setq display-time-day-and-date t
-;; display-time-24hr-format t)
-;; (display-time)
-;; ;
-;; ;; Posar en català el calendari
-;; ;; Font: https://www.emacswiki.org/emacs/CalendarLocalization#toc4
-;; (setq european-calendar-style 't)
-;; (setq
-;;     calendar-week-start-day 1
-;;     calendar-day-name-array ["dg" "dll" "dm" "dx" "dj" "dv" "ds"]
-;;     calendar-month-name-array ["gener" "febrer" "març" "abril" "maig" "juny" "juliol" "agost" "setembre" "octubre" "novembre" "desembre"]
-;;    )
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(xref-js2 which-key wgrep-ag web-mode web-beautify use-package smex smartparens smart-comment restart-emacs rainbow-mode rainbow-delimiters persistent-scratch pdf-tools org-plus-contrib org-bullets omnisharp olivetti neotree mwim move-text markdown-toc jsonnet-mode json-mode js2-refactor iy-go-to-char ivy-rich iedit helm-swoop helm-projectile helm-gitignore grip-mode gitlab-ci-mode github-pullrequest gitconfig-mode git-timemachine git-messenger git-link git-gutter ggtags fountain-mode flx fira-code-mode emmet-mode el-init duplicate-thing doom-themes diredfl diminish diffview dashboard darktooth-theme counsel-projectile company-box buffer-move beacon anzu amx all-the-icons-ivy ag ace-window)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; --- end of .init.el file ---;
