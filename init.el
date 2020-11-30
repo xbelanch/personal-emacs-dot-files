@@ -9,6 +9,29 @@
       calendar-longitude 2.181137
       calendar-location-name "Barcelona, Spain")
 
+                                        ;-----------------;
+                                        ;--- Constants ---;
+                                        ;-----------------;
+
+(defconst sys/win32p
+  (eq system-type 'windows-nt)
+  "Are we running on a WinTel system?")
+
+(defconst sys/linuxp
+  (eq system-type 'gnu/linux)
+  "Are we running on a GNU/Linux system?")
+
+(when sys/win32p
+  (let ((base-system "cygwin64")) ;; msys64
+    (setenv "PATH"
+            (concat (getenv "PATH")
+                    (format ";C:\\%s\\usr\\local\\bin" base-system)
+                    (format ";C:\\%s\\opt\\bin" base-system)
+                    (format ";C:\\%s\\usr\\bin" base-system)
+                    (format ";C:\\%s\\bin" base-system)
+                    (format ";C:\\%s\\mingw64\\bin" base-system)))
+    (setq shell-file-name "C:/cygwin64/bin/bash")))
+
 
 ;; --- GC threshold to 1GB
 ;; What that does it means? I dunno, but that's the Mando way
@@ -21,8 +44,6 @@
           (lambda ()
             (setq gc-cons-threshold 100000000
                   gc-cons-percentage 0.1)))
-
-
 
 ;; --- Global variables definition
 (defvar version "0.1.0"
@@ -46,6 +67,22 @@
 ;; --- Set directory to add custom elisp code or installing packages
 ;; http://ergoemacs.org/emacs/emacs_installing_packages.html
 (add-to-list 'load-path "~/.emacs.d/elisp/")
+
+;; --- Handle with backup emacs files
+;; Source: https://stackoverflow.com/questions/2680389/how-to-remove-all-files-ending-with-made-by-emacs
+;; https://www.emacswiki.org/emacs/BackupDirectory
+(setq backup-directory-alist
+          `((".*" . ,temporary-file-directory)))
+
+(message "Deleting old backup files...")
+(let ((week (* 60 60 24 7))
+      (current (float-time (current-time))))
+  (dolist (file (directory-files temporary-file-directory t))
+    (when (and (backup-file-name-p file)
+               (> (- current (float-time (nth 5 (file-attributes file))))
+                  week))
+      (message "%s" file)
+      (delete-file file))))
 
 
 ;; --- Add Melpa package list
@@ -85,10 +122,16 @@
       use-package-always-ensure t
       use-package-compute-statistics t)
 
+
+(use-package auto-package-update
+  :custom
+  (auto-package-update-last-update-day-path (concat cache-dir ".last-package-update-day"))
+  (auto-package-update-delete-old-versions t))
+
+
 ;; https://github.com/emacsmirror/diminish
 ;; This package implements hiding or abbreviation of the mode line displays (lighters) of minor-modes.
 (use-package diminish)
-
 
                                         ;-------------------------------------------;
                                         ;---  UTF-8 as the default coding system ---;
@@ -103,6 +146,9 @@
   (set-terminal-coding-system  'utf-8)
   (set-keyboard-coding-system  'utf-8)
   (set-selection-coding-system 'utf-8)
+  ;; src: https://stackoverflow.com/questions/22647517/emacs-encoding-of-pasted-text
+  (set-clipboard-coding-system 'utf-16le-dos)
+  ;; (set-language-environment "Catalan")
   (setq locale-coding-system   'utf-8)
   (setq-default buffer-file-coding-system 'utf-8))
 
@@ -120,7 +166,7 @@
  help-window-select t                             ; Focus new help windows when opened
  indent-tabs-mode nil                             ; Prefers spaces over tabs
  inhibit-startup-screen t                         ; Disable start-up screen
- initial-scratch-message ""                       ; Empty the initial *scratch* buffer
+;; initial-scratch-message ""                       ; Empty the initial *scratch* buffer
  kill-ring-max 128                                ; Maximum length of kill ring
  load-prefer-newer t                              ; Prefers the newest version of a file
  mark-ring-max 128                                ; Maximum length of mark ring
@@ -130,6 +176,7 @@
  tab-width 4                                      ; Set width for tabs
  use-package-always-ensure t                      ; Avoid the :ensure keyword for each package
  vc-follow-symlinks t                             ; Always follow the symlinks
+ global-auto-revert-mode t                        ; Auto-refresh all buffers when files have changed on disk
  view-read-only t)                                ; Always open read-only buffers in view-mode
 (cd "~/")                                         ; Move to the user directory
 (column-number-mode 1)                            ; Show the column number
@@ -210,7 +257,7 @@
 (if window-system
     (progn
       ;; Maximize Emacs at startup
-      (add-to-list 'default-frame-alist '(fullscreen . maximized))
+      ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
       (setq use-default-font-for-symbols nil)
       (setq inhibit-compacting-font-caches t)))
 
@@ -224,9 +271,15 @@
   (push " *NeoTree*" aw-ignored-buffers)
   (push "*which-key*" aw-ignored-buffers))
 
-
-
-
+(use-package windmove
+  :demand
+  ;; :bind
+  ;; (("M-S-<down>" . windmove-down)
+  ;;  ("M-S-<up>" . windmove-up)
+  ;;  ("M-S-<left>" . windmove-left)
+  ;;  ("M-S-<right>" . windmove-right))
+  :config
+  (windmove-default-keybindings))
 
                                         ;-----------------------;
                                         ;--- Fonts and Icons ---;
@@ -351,141 +404,30 @@
 
 (use-package counsel
   :after ivy
-  :delight
-  :bind (("C-x C-d" . counsel-dired-jump)
-         ("C-x C-h" . counsel-minibuffer-history)
-         ("C-x C-l" . counsel-find-library)
-         ("C-x C-r" . counsel-recentf)
-         ("C-x C-u" . counsel-unicode-char)
-         ("C-x C-v" . counsel-set-variable))
-  :config (counsel-mode)
-  :custom (counsel-rg-base-command "rg -S -M 150 --no-heading --line-number --color never %s"))
+  :config (counsel-mode))
 
+;; Better performance on Windows
+(when sys/win32p
+  (setq ivy-dynamic-exhibit-delay-ms 200))
 
-;--- Ivy ---;
+(setq swiper-action-recenter t)
+
+                                        ;--- Ivy ---;
 
 (use-package ivy
-  :delight
-  :after ivy-rich
-  :bind (("C-x b" . ivy-switch-buffer)
-         ("C-x B" . ivy-switch-buffer-other-window)
-         ("M-H"   . ivy-resume)
-         :map ivy-minibuffer-map
-         ("<tab>" . ivy-alt-done)
-         ("C-i" . ivy-partial-or-done)
-         ("S-SPC" . nil)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-switch-buffer-kill))
+  :defer 0.1
+  :diminish
+  :bind (("C-c C-r" . ivy-resume)
+         ("C-x B"   . ivy-switch-buffer-other-window))
+  :commands ivy-mode
   :custom
-  (ivy-case-fold-search-default t)
   (ivy-count-format "(%d/%d) ")
-  (ivy-re-builders-alist '((t . ivy--regex-plus)))
   (ivy-use-virtual-buffers t)
   :config (ivy-mode))
 
-(use-package ivy-pass
-  :after ivy
-  :commands ivy-pass)
-
+;; More friendly display transformer for Ivy
 (use-package ivy-rich
-  :defer 0.1
-  :preface
-  (defun ivy-rich-branch-candidate (candidate)
-    "Displays the branch candidate of the candidate for ivy-rich."
-    (let ((candidate (expand-file-name candidate ivy--directory)))
-      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
-          ""
-        (format "%s%s"
-                (propertize
-                 (replace-regexp-in-string abbreviated-home-dir "~/"
-                                           (file-name-directory
-                                            (directory-file-name candidate)))
-                 'face 'font-lock-doc-face)
-                (propertize
-                 (file-name-nondirectory
-                  (directory-file-name candidate))
-                 'face 'success)))))
-
-  (defun ivy-rich-compiling (candidate)
-    "Displays compiling buffers of the candidate for ivy-rich."
-    (let* ((candidate (expand-file-name candidate ivy--directory)))
-      (if (or (not (file-exists-p candidate)) (file-remote-p candidate)
-              (not (magit-git-repo-p candidate)))
-          ""
-        (if (my/projectile-compilation-buffers candidate)
-            "compiling"
-          ""))))
-
-  (defun ivy-rich-file-group (candidate)
-    "Displays the file group of the candidate for ivy-rich"
-    (let ((candidate (expand-file-name candidate ivy--directory)))
-      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
-          ""
-        (let* ((group-id (file-attribute-group-id (file-attributes candidate)))
-               (group-function (if (fboundp #'group-name) #'group-name #'identity))
-               (group-name (funcall group-function group-id)))
-          (format "%s" group-name)))))
-
-  (defun ivy-rich-file-modes (candidate)
-    "Displays the file mode of the candidate for ivy-rich."
-    (let ((candidate (expand-file-name candidate ivy--directory)))
-      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
-          ""
-        (format "%s" (file-attribute-modes (file-attributes candidate))))))
-
-  (defun ivy-rich-file-size (candidate)
-    "Displays the file size of the candidate for ivy-rich."
-    (let ((candidate (expand-file-name candidate ivy--directory)))
-      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
-          ""
-        (let ((size (file-attribute-size (file-attributes candidate))))
-          (cond
-           ((> size 1000000) (format "%.1fM " (/ size 1000000.0)))
-           ((> size 1000) (format "%.1fk " (/ size 1000.0)))
-           (t (format "%d " size)))))))
-
-  (defun ivy-rich-file-user (candidate)
-    "Displays the file user of the candidate for ivy-rich."
-    (let ((candidate (expand-file-name candidate ivy--directory)))
-      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
-          ""
-        (let* ((user-id (file-attribute-user-id (file-attributes candidate)))
-               (user-name (user-login-name user-id)))
-          (format "%s" user-name)))))
-
-  (defun ivy-rich-switch-buffer-icon (candidate)
-    "Returns an icon for the candidate out of `all-the-icons'."
-    (with-current-buffer
-        (get-buffer candidate)
-      (let ((icon (all-the-icons-icon-for-mode major-mode :height 0.9)))
-        (if (symbolp icon)
-            (all-the-icons-icon-for-mode 'fundamental-mode :height 0.9)
-          icon))))
-  :config
-  (plist-put ivy-rich-display-transformers-list
-             'counsel-find-file
-             '(:columns
-               ((ivy-rich-candidate               (:width 73))
-                (ivy-rich-file-user               (:width 8 :face font-lock-doc-face))
-                (ivy-rich-file-group              (:width 4 :face font-lock-doc-face))
-                (ivy-rich-file-modes              (:width 11 :face font-lock-doc-face))
-                (ivy-rich-file-size               (:width 7 :face font-lock-doc-face))
-                (ivy-rich-file-last-modified-time (:width 30 :face font-lock-doc-face)))))
-  (plist-put ivy-rich-display-transformers-list
-             'counsel-projectile-switch-project
-             '(:columns
-               ((ivy-rich-branch-candidate        (:width 80))
-                (ivy-rich-compiling))))
-  (plist-put ivy-rich-display-transformers-list
-             'ivy-switch-buffer
-             '(:columns
-               ((ivy-rich-switch-buffer-icon       (:width 2))
-                (ivy-rich-candidate                (:width 40))
-                (ivy-rich-switch-buffer-size       (:width 7))
-                (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-                (ivy-rich-switch-buffer-major-mode (:width 20 :face warning)))
-               :predicate (lambda (cand) (get-buffer cand))))
-  (ivy-rich-mode 1))
+    :after ivy)
 
 (use-package all-the-icons-ivy
   :after (all-the-icons ivy)
@@ -495,8 +437,35 @@
   (add-to-list 'all-the-icons-ivy-file-commands 'counsel-find-library)
   (all-the-icons-ivy-setup))
 
-                                        ;--- Swiper ---;
+;; Better experience with icons
+;; Enable it before`ivy-rich-mode' for better performance
+(use-package all-the-icons-ivy-rich
+  :hook (ivy-mode . all-the-icons-ivy-rich-mode))
 
+
+;; Common actions for counsel-ag, counsel-fzf, and counsel-recentf
+(defun my-counsel-fzf-in-default-dir (_arg)
+  "Search the current directory with fzf."
+  (counsel-fzf ivy-text default-directory))
+(defun my-counsel-fzf-in-dir (_arg)
+  "Search again with new root directory."
+  (counsel-fzf ivy-text
+               (read-directory-name
+                (concat (car (split-string counsel-fzf-cmd))
+                        " in directory: "))))
+(defun my-counsel-ag-in-dir (_arg)
+  "Search again with new root directory."
+  (let ((current-prefix-arg '(4)))
+    (counsel-ag ivy-text nil ""))) ;; also disable extra-ag-args
+
+
+                                        ;---  Smex ---;
+(use-package smex
+  :init (smex-initialize)
+  :bind
+  ("M-x" . smex))
+
+                                        ;--- Swiper ---;
 (use-package swiper
   :after ivy
   :bind (("C-s" . swiper)
@@ -528,19 +497,20 @@
                                         ;--- Neotree ---;
 
 (use-package neotree
-  :functions (neotree-resize-window neotree-project-dir)
+  ;; :functions (neotree-resize-window neotree-project-dir)
   :commands neotree-project-dir
-  :hook ((neo-enter . neotree-resize-window))
+  ;; :hook ((neo-enter . neotree-resize-window))
   :bind ("<f9>" . 'neotree-project-dir)
   :config
 
-  (defun neotree-resize-window (&rest _args)
-    "Resize neotree window."
-    (neo-global--when-window
-     (let ((fit-window-to-buffer-horizontally t))
-       (neo-buffer--unlock-width)
-       (fit-window-to-buffer)
-       (neo-buffer--lock-width))))
+  ;; This is really annoying!
+  ;; (defun neotree-resize-window (&rest _args)
+  ;;   "Resize neotree window."
+  ;;   (neo-global--when-window
+  ;;    (let ((fit-window-to-buffer-horizontally t))
+  ;;      (neo-buffer--unlock-width)
+  ;;      (fit-window-to-buffer)
+  ;;      (neo-buffer--lock-width))))
 
   (defun neotree-project-dir ()
     "Open NeoTree using the git root."
@@ -555,7 +525,7 @@
                 (neotree-find file-name))))))
   :custom
   (neo-theme (if (display-graphic-p) 'icons 'nerd))
-  (neo-window-width 40)
+  (neo-window-width 24)
   (neo-create-file-auto-open t)
   (neo-show-updir-line nil)
   (neo-mode-line-type 'neotree)
@@ -713,6 +683,16 @@
 (setq org-time-stamp-custom-formats
   '("<%a %d %b %Y" . "<%a %d %b %Y %H:%M>"))
 
+;; Provides notifications for scheduled or deadlined agenda entries.
+;; src: https://github.com/spegoraro/org-alert
+;; src: https://github.com/gkowzan/alert-toast
+(require 'org-alert)
+(require 'alert-toast)
+(setq alert-default-style 'libnotify)
+(when sys/win32p
+  (setq alert-default-style 'toast))
+
+
 ;----------------------;
 ; --- Miscellaneous ---;
 ;----------------------;
@@ -759,28 +739,26 @@
 ;;Setting up Emacs for JavaScript (part #1) Setting up Emacs for JavaScript (part #2)
 ;;I like to use prettier to get my TypeScript code clean. To use it, dont forget to install it with your package manager.
 
-(use-package prettier-js
-  :delight
-  :custom (prettier-js-args '("--print-width" "100"
-                              "--single-quote" "true"
-                              "--trailing-comma" "all")))
-
 ;; By default, GNU Emacs uses js-mode as major mode for JavaScript buffers and I prefer use js2-mode instead because of his abilities to parses buffers and builds an AST for things like syntax highlighting.
+
 (use-package js2-mode
-  :hook ((js2-mode . js2-imenu-extras-mode)
-         (js2-mode . prettier-js-mode))
-  :mode "\\.js\\'"
-  :custom (js-indent-level 2))
+  :init
+  (setq js-indent-level 2)
+  :mode (("\\.js" . js2-mode)
+         ("\\.sjs" . js2-mode))
+  :config
+  (add-hook 'js2-mode-hook #'js2-imenu-extras-mode) ;; Better imenu
+  (add-hook 'js2-mode-hook (lambda ()
+                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
 
-;; Makes it easy to jump to function references or definitions.
-(use-package xref-js2 :defer 5)
-
+(use-package xref-js2)
 
                                         ;--- JSON ---;
 
 (use-package json-mode
-  :custom
-  (js-indent-level 2))
+  :mode (("\\.json\\'" . json-mode)
+         ("\\manifest.webapp\\'" . json-mode )
+         ("\\.tern-project\\'" . json-mode)))
 
 (use-package jsonnet-mode)
 

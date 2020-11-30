@@ -2,6 +2,10 @@
 .#recentf
 .#*
 .cache/*
+elisp/*
+local/*
+.persistent-scratch
+all-the-icons-fonts/*
 emms/*
 emojis/*
 rcirc-log/*
