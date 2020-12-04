@@ -21,17 +21,16 @@
   (eq system-type 'gnu/linux)
   "Are we running on a GNU/Linux system?")
 
-(when sys/win32p
-  (let ((base-system "cygwin64")) ;; msys64
-    (setenv "PATH"
-            (concat (getenv "PATH")
-                    (format ";C:\\%s\\usr\\local\\bin" base-system)
-                    (format ";C:\\%s\\opt\\bin" base-system)
-                    (format ";C:\\%s\\usr\\bin" base-system)
-                    (format ";C:\\%s\\bin" base-system)
-                    (format ";C:\\%s\\mingw64\\bin" base-system)))
-    (setq shell-file-name "C:/cygwin64/bin/bash")))
 
+;; Src: https://caiorss.github.io/Emacs-Elisp-Programming/Emacs_On_Windows.html
+;; (when sys/win32p
+;;   (setenv  "PATH" (concat
+;;                    ;; Unix tools
+;;                    "C:\\Program Files\\Git\\usr\\bin" ";"
+;;                    ;; FZF
+;;                    "C:\\Users\\Rotter\\Desktop\\fzf" ";"
+;;                    (getenv "PATH")
+;;          )))
 
 ;; --- GC threshold to 1GB
 ;; What that does it means? I dunno, but that's the Mando way
@@ -176,6 +175,7 @@
  tab-width 4                                      ; Set width for tabs
  use-package-always-ensure t                      ; Avoid the :ensure keyword for each package
  vc-follow-symlinks t                             ; Always follow the symlinks
+ electric-pair-preserve-balance nil               ; Electric pair mode for completing parenthesis or brackets
  global-auto-revert-mode t                        ; Auto-refresh all buffers when files have changed on disk
  view-read-only t)                                ; Always open read-only buffers in view-mode
 (cd "~/")                                         ; Move to the user directory
