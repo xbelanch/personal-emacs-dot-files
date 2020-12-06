@@ -281,6 +281,12 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :bind
   ("M-w" . ace-window))
 
+;; show buffer file name in title bar
+(setq frame-title-format
+      '((:eval (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))
+                 "%b"))))
+
 
                                         ;-----------------------;
                                         ;--- Fonts and Icons ---;
@@ -592,13 +598,15 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   (add-hook 'after-save-hook #'export-to-pdf))
 
 
-;; ;-----------;
-;; ;--- ORG ---;
-;; ;-----------;
+                                        ;-----------;
+                                        ;--- ORG ---;
+                                        ;-----------;
 
 (use-package org
-  :custom
-  (org-log-done t))
+  :bind (("C-c l" . org-store-link)
+         ("C-c a" . org-agenda)
+         ("C-c c" . org-capture)
+         ("C-c b" . org-iswitchb)))
 
 (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)" "DROP(x!)"))
       org-log-into-drawer t)
@@ -610,9 +618,9 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (setq org-time-stamp-custom-formats
       '("<%a %d %b %Y" . "<%a %d %b %Y %H:%M>"))
 
-;; ;----------------------;
-;; ; --- Miscellaneous ---;
-;; ;----------------------;
+                                        ;----------------------;
+                                        ; --- Miscellaneous ---;
+                                        ;----------------------;
 
 (use-package smart-comment
   :bind ("M-;" . smart-comment))
@@ -625,11 +633,40 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;; Set the cursor as a box
 (set-cursor-color "#ffff00")
 
+;; use ibuffer instead of buffer
+(bind-key "C-x C-b" 'ibuffer)
+
+;; store all backup and autosave files in the tmp dir
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
 ;;                                         ;-------------------;
 ;;                                         ;--- Programming ---;
 ;;                                         ;-------------------;
+(use-package smartparens-config
+  :ensure smartparens
+  :config (progn (show-smartparens-global-mode t)))
 
+(add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
+(add-hook 'markdown-mode-hook 'turn-on-smartparens-mode)
+
+;; cc-mode
+(use-package cc-mode
+  :commands (cc-mode)
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (c-set-offset 'inextern-lang 0)
+              (setq-local c-default-style "K&R")
+              (setq-local indent-tabs-mode nil)
+              (setq-local tab-width 4)
+              (setq-local c-basic-offset 4)))
+  (list c-mode-map c++-mode-map))
+
+
+;; web-mode
 (use-package web-mode
   :mode ("\\.html?\\'" "\\.css?\\'")
   :custom
@@ -657,6 +694,9 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :config
   (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)) ;; Better imenu
 (use-package xref-js2)
+(add-hook 'js2-mode-hook (lambda ()
+  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+(setq xref-js2-search-program 'ag)
 (use-package json-mode
   :mode (("\\.json\\'" . json-mode)
          ("\\manifest.webapp\\'" . json-mode )
