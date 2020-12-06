@@ -6,6 +6,7 @@ elisp/*
 local/*
 .persistent-scratch
 all-the-icons-fonts/*
+dired-history
 emms/*
 emojis/*
 rcirc-log/*
