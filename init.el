@@ -652,15 +652,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
 (add-hook 'markdown-mode-hook 'turn-on-smartparens-mode)
 
-;; This isn't really a package, it just provides a `haxe-mode' to work with
-(use-package haxe-mode
-  :mode ("\\.hx\\'" . haxe-mode)
-  :no-require t
-  :init
-  (require 'js)
-  (define-derived-mode haxe-mode js-mode "Haxe"
-    "Haxe syntax highlighting mode. This is simply using js-mode for now."))
-
 ;; cc-mode
 (use-package cc-mode
   :commands (cc-mode)
