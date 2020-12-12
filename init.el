@@ -485,6 +485,8 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;;                                         ;--- Productivity ---;
 ;;                                         ;--------------------;
 
+(use-package multiple-cursors)
+
 (use-package recentf
   :init
   (setq recentf-max-menu-items 9)
