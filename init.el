@@ -747,20 +747,40 @@ e.g. Sunday, September 17, 2000."
   (interactive)                 ; permit invocation in minibuffer
   (insert (format-time-string "%A, %B %e, %Y")))
 
-;;                                         ;-------------------------;
-;;                                         ;--- Persisten scratch ---;
-;;                                         ;-------------------------;
+                                         ;-------------------------;
+                                         ;--- Persisten scratch ---;
+                                         ;-------------------------;
 
 (use-package persistent-scratch
   :ensure t
   :config
   (persistent-scratch-setup-default))
 
-;;                                         ;-----------------------------------;
-;;                                         ;--- Path filename to clipboard  ---;
-;;                                         ;-----------------------------------;
+                                        ;--------------------------------------;
+                                        ;--- Functions I taken from nowhere ---;
+                                        ;--------------------------------------;
+(defun my/buffer-file-name ()
+  (if (equal major-mode 'dired-mode)
+      default-directory
+    (buffer-file-name)))
 
-(defun copy-file-path-on-clipboard ()
+(defun my/put-buffer-name-on-clipboard ()
+  "Put the current buffer name on the clipboard"
+  (interactive)
+  (kill-new (buffer-name))
+  (message (buffer-name)))
+
+;;; Taken from here:
+;;; http://stackoverflow.com/questions/2416655/file-path-to-clipboard-in-emacs
+(defun my/put-file-name-on-clipboard ()
+  "Put the current file name on the clipboard"
+  (interactive)
+  (let ((filename (my/buffer-file-name)))
+    (when filename
+      (kill-new filename)
+      (message filename))))
+
+(defun my/put-file-path-on-clipboard ()
   "Put the current file name on the clipboard"
   (interactive)
   (let ((filename (if (equal major-mode 'dired-mode)
@@ -771,6 +791,36 @@ e.g. Sunday, September 17, 2000."
         (insert filename)
         (clipboard-kill-region (point-min) (point-max)))
       (message filename))))
+
+(defun my/start-simple-http-server ()
+  (interactive)
+  (shell-command "http-server.cmd -c-1 -p 8010 &"
+                 "*Simple npm HTTP Server*"))
+
+(global-set-key (kbd "C-x p s") 'my/start-simple-http-server)
+
+
+;;; Stolen from http://ergoemacs.org/emacs/emacs_unfill-paragraph.html
+(defun my/unfill-paragraph ()
+  "Replace newline chars in current paragraph by single spaces.
+This command does the inverse of `fill-paragraph'."
+  (interactive)
+  (let ((fill-column 90002000)) ; 90002000 is just random. you can use `most-positive-fixnum'
+    (fill-paragraph nil)))
+
+(global-set-key (kbd "C-c M-q") 'my/unfill-paragraph)
+
+(defconst my/frame-transparency 65)
+
+(defun my/toggle-transparency ()
+  (interactive)
+  (let ((frame-alpha (frame-parameter nil 'alpha)))
+    (if (or (not frame-alpha)
+            (= (cadr frame-alpha) 100))
+        (set-frame-parameter nil 'alpha
+                             `(,my/frame-transparency
+                               ,my/frame-transparency))
+      (set-frame-parameter nil 'alpha '(100 100)))))
 
 ;;                                         ;-----------------;
 ;;                                         ;--- Dashboard ---;
