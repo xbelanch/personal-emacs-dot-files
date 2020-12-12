@@ -487,6 +487,18 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 (use-package multiple-cursors)
 
+(use-package yasnippet
+  :init
+  (setq yas/triggers-in-field nil)
+  :bind
+  ("C-c y s" . yas-insert-snippet)
+  ("C-c y v" . yas-visit-snippet-file)
+  :config
+  (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets/")
+  (yas-global-mode 1))
+
+
+
 (use-package recentf
   :init
   (setq recentf-max-menu-items 9)
