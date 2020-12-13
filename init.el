@@ -287,7 +287,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
                    (abbreviate-file-name (buffer-file-name))
                  "%b"))))
 
-
                                         ;-----------------------;
                                         ;--- Fonts and Icons ---;
                                         ;-----------------------;
@@ -328,7 +327,9 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package display-line-numbers
-  :hook ((prog-mode text-mode) . display-line-numbers-mode))
+  :hook ((prog-mode text-mode) . display-line-numbers-mode)
+  :custom
+  (display-line-numbers-type (quote relative)))
 
 (use-package whitespace
   :diminish global-whitespace-mode
@@ -463,12 +464,12 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 ;; In addition to that, I like to see the lines that are being modified in the file while it is being edited.
 (use-package git-gutter
-  :hook ((prog-mode text-mode) . git-gutter-mode)
-  :diminish git-gutter-mode
-  :custom
-  (git-gutter:hide-gutter t)
-  (git-gutter:update-interval 2.0)
-  (git-gutter:verbosity 0))
+  :hook ((prog-mode text-mode) . git-gutter-mode))
+  ;; :diminish git-gutter-mode
+  ;; :custom
+  ;; (git-gutter:hide-gutter t)
+  ;; (git-gutter:update-interval 2.0)
+  ;; (git-gutter:verbosity 0))
 
 (use-package gitignore-mode)
 
@@ -486,18 +487,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;;                                         ;--------------------;
 
 (use-package multiple-cursors)
-
-(use-package yasnippet
-  :init
-  (setq yas/triggers-in-field nil)
-  :bind
-  ("C-c y s" . yas-insert-snippet)
-  ("C-c y v" . yas-visit-snippet-file)
-  :config
-  (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets/")
-  (yas-global-mode 1))
-
-
 
 (use-package recentf
   :init
@@ -665,6 +654,15 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
 (add-hook 'markdown-mode-hook 'turn-on-smartparens-mode)
+
+;; readme: http://www.howardism.org/Technical/Emacs/templates-tutorial.html
+(use-package yasnippet
+  :ensure t
+  :diminish (yas-minor-mode)
+  :init (yas-global-mode 1)
+  :config
+  (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
+  (yas-reload-all t))
 
 ;; cc-mode
 (use-package cc-mode
