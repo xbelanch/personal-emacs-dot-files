@@ -486,7 +486,10 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;;                                         ;--- Productivity ---;
 ;;                                         ;--------------------;
 
-(use-package multiple-cursors)
+(use-package multiple-cursors
+    :bind (("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/unmark-next-like-this)
+         ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
 
 (use-package recentf
   :init
