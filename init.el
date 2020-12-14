@@ -609,7 +609,8 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :bind (("C-c l" . org-store-link)
          ("C-c a" . org-agenda)
          ("C-c c" . org-capture)
-         ("C-c b" . org-iswitchb)))
+         ("C-c b" . org-iswitchb))
+  :custom (org-agenda-files (list "~/.emacs.d/org")))
 
 (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)" "DROP(x!)"))
       org-log-into-drawer t)
