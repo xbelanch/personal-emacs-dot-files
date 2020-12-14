@@ -652,6 +652,9 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;;                                         ;-------------------;
 ;;                                         ;--- Programming ---;
 ;;                                         ;-------------------;
+(setq compilation-scroll-output t)
+(setq compilation-window-height 15)
+
 (use-package smartparens-config
   :ensure smartparens
   :config (progn (show-smartparens-global-mode t)))
