@@ -204,6 +204,9 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 (setq-default indent-tabs-mode nil)
 
+;; Shift + Enter for inser new line and jump to it
+(global-set-key (kbd "<S-return>") (kbd "C-e C-m"))
+
 (cd "~/")                                         ; Move to the user directory
 (column-number-mode 1)                            ; Show the column number
 (display-time-mode 1)                             ; Enable time in the mode-line
@@ -653,7 +656,7 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;;                                         ;--- Programming ---;
 ;;                                         ;-------------------;
 (setq compilation-scroll-output t)
-(setq compilation-window-height 15)
+(setq compilation-window-height 20)
 
 (use-package smartparens-config
   :ensure smartparens
@@ -671,6 +674,32 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
   (yas-reload-all t))
 
+(when (executable-find "global")
+;;;; ggtags
+  ;; https://github.com/leoliu/ggtags
+  (use-package ggtags
+    :commands ggtags-mode
+    :diminish ggtags-mode
+    :bind (("M-*" . pop-tag-mark)
+           ("C-c t s" . ggtags-find-other-symbol)
+           ("C-c t h" . ggtags-view-tag-history)
+           ("C-c t r" . ggtags-find-reference)
+           ("C-c t f" . ggtags-find-file)
+           ("C-c t c" . ggtags-create-tags))
+    :config
+    (progn
+      (setq ggtags-update-on-save nil) ;Don't try to update GTAGS on each save; makes the system sluggish for huge projects.
+      (setq ggtags-highlight-tag nil)  ;Don't auto-highlight tag at point.. makes the system really sluggish!
+      (setq ggtags-sort-by-nearness t) ; Enabling nearness requires global 6.5+
+      (setq ggtags-navigation-mode-lighter nil)
+      (setq ggtags-mode-line-project-name nil)
+      (setq ggtags-oversize-limit (* 30 1024 1024))) ; 30 MB
+
+    :init
+    (add-hook 'c-mode-common-hook
+              #'(lambda ()
+                  (when (derived-mode-p 'c-mode)
+                    (ggtags-mode 1))))))
 ;; cc-mode
 (use-package cc-mode
   :commands (cc-mode)
