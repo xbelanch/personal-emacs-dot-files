@@ -314,17 +314,17 @@ If you experience freezing, decrease this. If you experience stuttering, increas
                                         ;------------------;
                                         ;--- Doom theme ---;
                                         ;------------------;
+(add-to-list 'custom-theme-load-path
+             "~/.emacs.d/gruber-darker-theme/")
+
 (use-package doom-themes
   :demand t
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   :config
-  (load-theme 'doom-solarized-dark t))
-
-(add-to-list 'custom-theme-load-path
-             "~/.emacs.d/gruber-darker-theme/")
-
+  ;; (load-theme 'doom-solarized-dark t))
+  (load-theme 'gruber-darker t))
 
                                         ;----------------------------;
                                         ;--- Visual helpers bells ---;
@@ -676,12 +676,10 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
 (add-hook 'markdown-mode-hook 'turn-on-smartparens-mode)
 
-
 (use-package company
-  :defer t
   :init (global-company-mode))
 ;; Provide semi instant autocompletion.
-(setq company-idle-delay 0.5)
+(setq company-idle-delay 0.0)
 
 ;; readme: http://www.howardism.org/Technical/Emacs/templates-tutorial.html
 (use-package yasnippet
@@ -995,53 +993,3 @@ This command does the inverse of `fill-paragraph'."
 ;;   (dashboard-setup-startup-hook))
 
 ;; --- end of .init.el file ---;
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#282a36" "#ff5555" "#50fa7b" "#f1fa8c" "#61bfff" "#ff79c6" "#8be9fd" "#f8f8f2"])
- '(custom-enabled-themes '(gruber-darker))
- '(custom-safe-themes
-   '("d2098030ffc51462f4676c9a91f15e29833ee904a2608c83e87884965b73e5b7" "990e24b406787568c592db2b853aa65ecc2dcd08146c0d22293259d400174e37" "e6ff132edb1bfa0645e2ba032c44ce94a3bd3c15e3929cdf6c049802cf059a2a" "711efe8b1233f2cf52f338fd7f15ce11c836d0b6240a18fffffc2cbd5bfe61b0" "bf387180109d222aee6bb089db48ed38403a1e330c9ec69fe1f52460a8936b66" default))
- '(fci-rule-color "#6272a4")
- '(gdb-many-windows t t)
- '(jdee-db-active-breakpoint-face-colors (cons "#1E2029" "#bd93f9"))
- '(jdee-db-requested-breakpoint-face-colors (cons "#1E2029" "#50fa7b"))
- '(jdee-db-spec-breakpoint-face-colors (cons "#1E2029" "#565761"))
- '(objed-cursor-color "#ff5555")
- '(package-selected-packages
-   '(company quelpa yasnippet yaml-mode xref-js2 which-key web-mode web use-package smex smartparens smart-comment restart-emacs rainbow-mode rainbow-delimiters persistent-scratch org-bullets olivetti mwim multiple-cursors move-text markdown-mode+ magit jsonnet-mode json-mode gitignore-mode git-timemachine git-messenger git-link git-gutter ggtags gcmh fountain-mode emmet-mode duplicate-thing doom-themes disk-usage diredfl dired-subtree dired-recent dired-narrow dired-git-info diminish deadgrep counsel-projectile charmap anzu all-the-icons-ivy-rich all-the-icons-ivy ace-window))
- '(pdf-view-midnight-colors (cons "#f8f8f2" "#282a36"))
- '(rustic-ansi-faces
-   ["#282a36" "#ff5555" "#50fa7b" "#f1fa8c" "#61bfff" "#ff79c6" "#8be9fd" "#f8f8f2"])
- '(vc-annotate-background "#282a36")
- '(vc-annotate-color-map
-   (list
-    (cons 20 "#50fa7b")
-    (cons 40 "#85fa80")
-    (cons 60 "#bbf986")
-    (cons 80 "#f1fa8c")
-    (cons 100 "#f5e381")
-    (cons 120 "#face76")
-    (cons 140 "#ffb86c")
-    (cons 160 "#ffa38a")
-    (cons 180 "#ff8ea8")
-    (cons 200 "#ff79c6")
-    (cons 220 "#ff6da0")
-    (cons 240 "#ff617a")
-    (cons 260 "#ff5555")
-    (cons 280 "#d45558")
-    (cons 300 "#aa565a")
-    (cons 320 "#80565d")
-    (cons 340 "#6272a4")
-    (cons 360 "#6272a4")))
- '(vc-annotate-very-old-color nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(web-mode-current-element-highlight-face ((nil (:background "#073642"))))
- '(web-mode-html-tag-bracket-face ((nil (:foreground "Snow3")))))
