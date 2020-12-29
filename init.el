@@ -297,7 +297,9 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (add-hook 'after-init-hook
           (lambda ()
             (when (member "Fantasque Sans Mono" (font-family-list))
+            ;; (when (member "Ubuntu Mono" (font-family-list))
               (set-face-attribute 'default nil :font "Fantasque Sans Mono")
+              ;; (set-face-attribute 'default nil :font "Ubuntu Mono-18")
               (set-face-attribute 'default nil :height 140)
               (set-face-attribute 'default nil :weight 'normal))))
 
@@ -319,6 +321,10 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   (doom-themes-enable-italic t)
   :config
   (load-theme 'doom-solarized-dark t))
+
+(add-to-list 'custom-theme-load-path
+             "~/.emacs.d/gruber-darker-theme/")
+
 
                                         ;----------------------------;
                                         ;--- Visual helpers bells ---;
@@ -462,8 +468,13 @@ If you experience freezing, decrease this. If you experience stuttering, increas
                                         ;--- GIT - MAGIT - IT'S MAGIC ---;
                                         ;--------------------------------;
 
-(use-package git-commit
-  :hook (after-init . global-git-commit-mode))
+;; (use-package git-commit
+;;   :hook (after-init . global-git-commit-mode))
+
+;; The mode-line information isn’t always up-to-date
+;; src: https://magit.vc/manual/magit/The-mode_002dline-information-isn_0027t-always-up_002dto_002ddate.html
+;; src: https://emacs.stackexchange.com/questions/48090/mode-line-not-updated-after-checking-out-new-branch-using-magit
+;; (setq vc-handled-backends nil)
 
 ;; In addition to that, I like to see the lines that are being modified in the file while it is being edited.
 (use-package git-gutter
@@ -476,11 +487,11 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 (use-package gitignore-mode)
 
-(use-package git-link)
+;; (use-package git-link)
 
-(use-package git-messenger)
+;; (use-package git-messenger)
 
-(use-package git-timemachine)
+;; (use-package git-timemachine)
 
 (use-package magit
   :bind ("C-x g" . magit-status))
@@ -713,6 +724,32 @@ If you experience freezing, decrease this. If you experience stuttering, increas
               (setq-local c-basic-offset 4)))
   (list c-mode-map c++-mode-map))
 
+;; gdb
+(setq
+ ;; use gdb-many-windows by default
+ gdb-many-windows t
+
+ ;; Non-nil means display source file containing the main routine at startup
+ gdb-show-main t
+ )
+
+(defvar all-gud-modes
+  '(gud-mode comint-mode gdb-locals-mode gdb-frames-mode  gdb-breakpoints-mode)
+  "A list of modes when using gdb")
+(defun kill-all-gud-buffers ()
+  "Kill all gud buffers including Debugger, Locals, Frames, Breakpoints.
+Do this after `q` in Debugger buffer."
+  (interactive)
+  (save-excursion
+        (let ((count 0))
+          (dolist (buffer (buffer-list))
+                (set-buffer buffer)
+                (when (member major-mode all-gud-modes)
+                  (setq count (1+ count))
+                  (kill-buffer buffer)
+                  (delete-other-windows))) ;; fix the remaining two windows issue
+          (message "Killed %i buffer(s)." count))))
+
 
 ;; web-mode
 (use-package web-mode
@@ -847,6 +884,31 @@ e.g. Sunday, September 17, 2000."
 
 (global-set-key (kbd "C-x p s") 'my/start-simple-http-server)
 
+;; Revert all open buffers (and ignore errors)
+(defun my/revert-all-file-buffers ()
+  "Refresh all open file buffers without confirmation.
+Buffers in modified (not yet saved) state in emacs will not be reverted. They
+will be reverted though if they were modified outside emacs.
+Buffers visiting files which do not exist any more or are no longer readable
+will be killed."
+  (interactive)
+  (dolist (buf (buffer-list))
+    (let ((filename (buffer-file-name buf)))
+      ;; Revert only buffers containing files, which are not modified;
+      ;; do not try to revert non-file buffers like *Messages*.
+      (when (and filename
+                 (not (buffer-modified-p buf)))
+        (if (file-readable-p filename)
+            ;; If the file exists and is readable, revert the buffer.
+            (with-current-buffer buf
+              (revert-buffer :ignore-auto :noconfirm :preserve-modes))
+          ;; Otherwise, kill the buffer.
+          (let (kill-buffer-query-functions) ; No query done when killing buffer
+            (kill-buffer buf)
+            (message "Killed non-existing/unreadable file buffer: %s" filename))))))
+  (message "Finished reverting buffers containing unmodified files."))
+
+
 
 ;;; Stolen from http://ergoemacs.org/emacs/emacs_unfill-paragraph.html
 (defun my/unfill-paragraph ()
@@ -926,3 +988,53 @@ This command does the inverse of `fill-paragraph'."
 ;;   (dashboard-setup-startup-hook))
 
 ;; --- end of .init.el file ---;
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#282a36" "#ff5555" "#50fa7b" "#f1fa8c" "#61bfff" "#ff79c6" "#8be9fd" "#f8f8f2"])
+ '(custom-enabled-themes '(gruber-darker doom-solarized-dark))
+ '(custom-safe-themes
+   '("d2098030ffc51462f4676c9a91f15e29833ee904a2608c83e87884965b73e5b7" "990e24b406787568c592db2b853aa65ecc2dcd08146c0d22293259d400174e37" "e6ff132edb1bfa0645e2ba032c44ce94a3bd3c15e3929cdf6c049802cf059a2a" "711efe8b1233f2cf52f338fd7f15ce11c836d0b6240a18fffffc2cbd5bfe61b0" "bf387180109d222aee6bb089db48ed38403a1e330c9ec69fe1f52460a8936b66" default))
+ '(fci-rule-color "#6272a4")
+ '(gdb-many-windows t t)
+ '(jdee-db-active-breakpoint-face-colors (cons "#1E2029" "#bd93f9"))
+ '(jdee-db-requested-breakpoint-face-colors (cons "#1E2029" "#50fa7b"))
+ '(jdee-db-spec-breakpoint-face-colors (cons "#1E2029" "#565761"))
+ '(objed-cursor-color "#ff5555")
+ '(package-selected-packages
+   '(quelpa yasnippet yaml-mode xref-js2 which-key web-mode web use-package smex smartparens smart-comment restart-emacs rainbow-mode rainbow-delimiters persistent-scratch org-bullets olivetti mwim multiple-cursors move-text markdown-mode+ magit jsonnet-mode json-mode gitignore-mode git-timemachine git-messenger git-link git-gutter ggtags gcmh fountain-mode emmet-mode duplicate-thing doom-themes disk-usage diredfl dired-subtree dired-recent dired-narrow dired-git-info diminish deadgrep counsel-projectile charmap anzu all-the-icons-ivy-rich all-the-icons-ivy ace-window))
+ '(pdf-view-midnight-colors (cons "#f8f8f2" "#282a36"))
+ '(rustic-ansi-faces
+   ["#282a36" "#ff5555" "#50fa7b" "#f1fa8c" "#61bfff" "#ff79c6" "#8be9fd" "#f8f8f2"])
+ '(vc-annotate-background "#282a36")
+ '(vc-annotate-color-map
+   (list
+    (cons 20 "#50fa7b")
+    (cons 40 "#85fa80")
+    (cons 60 "#bbf986")
+    (cons 80 "#f1fa8c")
+    (cons 100 "#f5e381")
+    (cons 120 "#face76")
+    (cons 140 "#ffb86c")
+    (cons 160 "#ffa38a")
+    (cons 180 "#ff8ea8")
+    (cons 200 "#ff79c6")
+    (cons 220 "#ff6da0")
+    (cons 240 "#ff617a")
+    (cons 260 "#ff5555")
+    (cons 280 "#d45558")
+    (cons 300 "#aa565a")
+    (cons 320 "#80565d")
+    (cons 340 "#6272a4")
+    (cons 360 "#6272a4")))
+ '(vc-annotate-very-old-color nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(web-mode-current-element-highlight-face ((nil (:background "#073642"))))
+ '(web-mode-html-tag-bracket-face ((nil (:foreground "Snow3")))))

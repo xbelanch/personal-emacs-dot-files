@@ -1,0 +1,3 @@
+[submodule "gruber-darker-theme"]
+	path = gruber-darker-theme
+	url = git://github.com/rexim/gruber-darker-theme.git
