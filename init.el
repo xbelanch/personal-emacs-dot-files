@@ -526,57 +526,8 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 (use-package charmap)
 
-;; Counsel / Ivy / Swiper / Smex / Projectile
 
-(use-package ivy
-  :defer 0.1
-  :diminish
-  :bind (("C-c C-r" . ivy-resume)
-         ("C-x B"   . ivy-switch-buffer-other-window))
-  :commands ivy-mode
-  :custom
-  (ivy-count-format "(%d/%d) ")
-  (ivy-use-virtual-buffers t)
-  :config (ivy-mode))
-
-(use-package swiper
-  :after ivy
-  :bind (("C-s" . swiper)
-         ("C-S-s" . swiper-all)
-         :map swiper-map
-         ("M-%" . swiper-query-replace)))
-
-(setq swiper-action-recenter t)
-
-(use-package counsel
-  :after ivy
-  :config (counsel-mode))
-
-;; Better performance on Windows
-(when sys/win32
-  (setq ivy-dynamic-exhibit-delay-ms 200))
-
-;; More friendly display transformer for Ivy
-(use-package ivy-rich
-    :after ivy)
-
-(use-package all-the-icons-ivy
-  :after (all-the-icons ivy)
-  :custom (all-the-icons-ivy-buffer-commands '(ivy-switch-buffer-other-window))
-  :config
-  (add-to-list 'all-the-icons-ivy-file-commands 'counsel-dired-jump)
-  (add-to-list 'all-the-icons-ivy-file-commands 'counsel-find-library)
-  (all-the-icons-ivy-setup))
-
-;; Better experience with icons
-;; Enable it before`ivy-rich-mode' for better performance
-(use-package all-the-icons-ivy-rich
-  :hook (ivy-mode . all-the-icons-ivy-rich-mode))
-
-(use-package smex
-  :init (smex-initialize)
-  :bind
-  ("M-x" . smex))
+;; Helm
 
 (use-package projectile
   :ensure t
@@ -959,17 +910,3 @@ This command does the inverse of `fill-paragraph'."
 ;;   (dashboard-setup-startup-hook))
 
 ;; --- end of .init.el file ---;
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(yasnippet yaml-mode xref-js2 which-key web-mode web use-package smex smartparens smart-comment restart-emacs rainbow-mode rainbow-delimiters persistent-scratch org-bullets olivetti mwim multiple-cursors move-text markdown-mode+ magit jsonnet-mode json-mode gitignore-mode git-gutter ggtags gcmh fountain-mode exec-path-from-shell emmet-mode duplicate-thing doom-themes disk-usage diredfl dired-subtree dired-recent dired-narrow dired-git-info diminish deadgrep counsel-projectile company charmap anzu all-the-icons-ivy-rich all-the-icons-ivy ace-window)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(web-mode-current-element-highlight-face ((nil (:background "#073642"))))
- '(web-mode-html-tag-bracket-face ((nil (:foreground "Snow3")))))
