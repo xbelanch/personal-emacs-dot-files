@@ -677,9 +677,14 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (add-hook 'markdown-mode-hook 'turn-on-smartparens-mode)
 
 (use-package company
-  :init (global-company-mode))
-;; Provide semi instant autocompletion.
-(setq company-idle-delay 0.0)
+  :init (global-company-mode)
+  :config
+  (global-set-key [C-tab] 'company-clang)
+  (setq company-auto-complete nil
+        company-tooltip-flip-when-above t
+        company-minimum-prefix-length 2
+        company-tooltip-limit 10
+        company-idle-delay 0.5))
 
 ;; readme: http://www.howardism.org/Technical/Emacs/templates-tutorial.html
 (use-package yasnippet
@@ -689,45 +694,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :config
   (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
   (yas-reload-all t))
-
-(when (executable-find "global")
-;;;; ggtags
-  ;; https://github.com/leoliu/ggtags
-  (use-package ggtags
-    :commands ggtags-mode
-    :diminish ggtags-mode
-    :bind (("M-*" . pop-tag-mark)
-           ("C-c t s" . ggtags-find-other-symbol)
-           ("C-c t h" . ggtags-view-tag-history)
-           ("C-c t r" . ggtags-find-reference)
-           ("C-c t f" . ggtags-find-file)
-           ("C-c t c" . ggtags-create-tags))
-    :config
-    (progn
-      (setq ggtags-update-on-save nil) ;Don't try to update GTAGS on each save; makes the system sluggish for huge projects.
-      (setq ggtags-highlight-tag nil)  ;Don't auto-highlight tag at point.. makes the system really sluggish!
-      (setq ggtags-sort-by-nearness t) ; Enabling nearness requires global 6.5+
-      (setq ggtags-navigation-mode-lighter nil)
-      (setq ggtags-mode-line-project-name nil)
-      (setq ggtags-oversize-limit (* 30 1024 1024))) ; 30 MB
-
-    :init
-    (add-hook 'c-mode-common-hook
-              #'(lambda ()
-                  (when (derived-mode-p 'c-mode)
-                    (ggtags-mode 1))))))
-;; cc-mode
-(use-package cc-mode
-  :commands (cc-mode)
-  :config
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (c-set-offset 'inextern-lang 0)
-              (setq-local c-default-style "K&R")
-              (setq-local indent-tabs-mode nil)
-              (setq-local tab-width 4)
-              (setq-local c-basic-offset 4)))
-  (list c-mode-map c++-mode-map))
 
 ;; gdb
 (setq
@@ -993,3 +959,17 @@ This command does the inverse of `fill-paragraph'."
 ;;   (dashboard-setup-startup-hook))
 
 ;; --- end of .init.el file ---;
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(yasnippet yaml-mode xref-js2 which-key web-mode web use-package smex smartparens smart-comment restart-emacs rainbow-mode rainbow-delimiters persistent-scratch org-bullets olivetti mwim multiple-cursors move-text markdown-mode+ magit jsonnet-mode json-mode gitignore-mode git-gutter ggtags gcmh fountain-mode exec-path-from-shell emmet-mode duplicate-thing doom-themes disk-usage diredfl dired-subtree dired-recent dired-narrow dired-git-info diminish deadgrep counsel-projectile company charmap anzu all-the-icons-ivy-rich all-the-icons-ivy ace-window)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(web-mode-current-element-highlight-face ((nil (:background "#073642"))))
+ '(web-mode-html-tag-bracket-face ((nil (:foreground "Snow3")))))
