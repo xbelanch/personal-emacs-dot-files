@@ -474,7 +474,15 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;; The mode-line information isn’t always up-to-date
 ;; src: https://magit.vc/manual/magit/The-mode_002dline-information-isn_0027t-always-up_002dto_002ddate.html
 ;; src: https://emacs.stackexchange.com/questions/48090/mode-line-not-updated-after-checking-out-new-branch-using-magit
-(setq vc-handled-backends nil)
+
+;; (setq vc-handled-backends nil)
+
+(defun my/revert-buffer-no-confirm ()
+  "Revert buffer without confirmation."
+  (interactive) (revert-buffer t t))
+
+;; Solution: https://www.reddit.com/r/emacs/comments/10rdl2/globalautorevertmode_1/
+(global-set-key (kbd "<f5>") 'my/revert-buffer-no-confirm)
 
 ;; In addition to that, I like to see the lines that are being modified in the file while it is being edited.
 (use-package git-gutter
