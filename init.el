@@ -314,17 +314,17 @@ If you experience freezing, decrease this. If you experience stuttering, increas
                                         ;------------------;
                                         ;--- Doom theme ---;
                                         ;------------------;
+(add-to-list 'custom-theme-load-path
+             "~/.emacs.d/gruber-darker-theme/")
+
 (use-package doom-themes
   :demand t
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   :config
-  (load-theme 'doom-solarized-dark t))
-
-(add-to-list 'custom-theme-load-path
-             "~/.emacs.d/gruber-darker-theme/")
-
+  ;; (load-theme 'doom-solarized-dark t))
+  (load-theme 'gruber-darker t))
 
                                         ;----------------------------;
                                         ;--- Visual helpers bells ---;
@@ -464,9 +464,9 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :bind (("M-SPC" . 'avy-goto-char-timer)
          ("M-g a" . 'avy-goto-line)))
 
-                                        ;--------------------------------;
-                                        ;--- GIT - MAGIT - IT'S MAGIC ---;
-                                        ;--------------------------------;
+                                        ;------------------;
+                                        ;--- IT'S MAGIT ---;
+                                        ;------------------;
 
 ;; (use-package git-commit
 ;;   :hook (after-init . global-git-commit-mode))
@@ -474,7 +474,7 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;; The mode-line information isn’t always up-to-date
 ;; src: https://magit.vc/manual/magit/The-mode_002dline-information-isn_0027t-always-up_002dto_002ddate.html
 ;; src: https://emacs.stackexchange.com/questions/48090/mode-line-not-updated-after-checking-out-new-branch-using-magit
-;; (setq vc-handled-backends nil)
+(setq vc-handled-backends nil)
 
 ;; In addition to that, I like to see the lines that are being modified in the file while it is being edited.
 (use-package git-gutter
@@ -526,57 +526,36 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 (use-package charmap)
 
-;; Counsel / Ivy / Swiper / Smex / Projectile
+;; Ido
+(use-package smex)
+(use-package ido-completing-read+)
+(ido-mode 1)
+(ido-everywhere 1)
+(ido-ubiquitous-mode 1)
 
-(use-package ivy
-  :defer 0.1
-  :diminish
-  :bind (("C-c C-r" . ivy-resume)
-         ("C-x B"   . ivy-switch-buffer-other-window))
-  :commands ivy-mode
-  :custom
-  (ivy-count-format "(%d/%d) ")
-  (ivy-use-virtual-buffers t)
-  :config (ivy-mode))
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
-(use-package swiper
-  :after ivy
-  :bind (("C-s" . swiper)
-         ("C-S-s" . swiper-all)
-         :map swiper-map
-         ("M-%" . swiper-query-replace)))
 
-(setq swiper-action-recenter t)
+;; Helm
+(use-package helm)
+(use-package helm-cmd-t)
+(use-package helm-git-grep)
+(use-package helm-ls-git)
+(use-package helm-ag)
 
-(use-package counsel
-  :after ivy
-  :config (counsel-mode))
+(setq helm-ff-transformer-show-only-basename nil)
 
-;; Better performance on Windows
-(when sys/win32
-  (setq ivy-dynamic-exhibit-delay-ms 200))
+(global-set-key (kbd "C-c h t") 'helm-cmd-t)
+(global-set-key (kbd "C-c h g g") 'helm-git-grep)
+(global-set-key (kbd "C-c h g l") 'helm-ls-git-ls)
+(global-set-key (kbd "C-c h f") 'helm-find)
+(global-set-key (kbd "C-c h r") 'helm-recentf)
+(global-set-key (kbd "C-c h a") 'helm-ag)
 
-;; More friendly display transformer for Ivy
-(use-package ivy-rich
-    :after ivy)
-
-(use-package all-the-icons-ivy
-  :after (all-the-icons ivy)
-  :custom (all-the-icons-ivy-buffer-commands '(ivy-switch-buffer-other-window))
-  :config
-  (add-to-list 'all-the-icons-ivy-file-commands 'counsel-dired-jump)
-  (add-to-list 'all-the-icons-ivy-file-commands 'counsel-find-library)
-  (all-the-icons-ivy-setup))
-
-;; Better experience with icons
-;; Enable it before`ivy-rich-mode' for better performance
-(use-package all-the-icons-ivy-rich
-  :hook (ivy-mode . all-the-icons-ivy-rich-mode))
-
-(use-package smex
-  :init (smex-initialize)
-  :bind
-  ("M-x" . smex))
+(use-package swiper-helm
+  :ensure t
+  :bind ("C-s" . swiper-helm))
 
 (use-package projectile
   :ensure t
@@ -676,6 +655,16 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
 (add-hook 'markdown-mode-hook 'turn-on-smartparens-mode)
 
+(use-package company
+  :init (global-company-mode)
+  :config
+  (global-set-key [C-tab] 'company-clang)
+  (setq company-auto-complete nil
+        company-tooltip-flip-when-above t
+        company-minimum-prefix-length 2
+        company-tooltip-limit 10
+        company-idle-delay 0.5))
+
 ;; readme: http://www.howardism.org/Technical/Emacs/templates-tutorial.html
 (use-package yasnippet
   :ensure t
@@ -684,45 +673,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :config
   (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
   (yas-reload-all t))
-
-(when (executable-find "global")
-;;;; ggtags
-  ;; https://github.com/leoliu/ggtags
-  (use-package ggtags
-    :commands ggtags-mode
-    :diminish ggtags-mode
-    :bind (("M-*" . pop-tag-mark)
-           ("C-c t s" . ggtags-find-other-symbol)
-           ("C-c t h" . ggtags-view-tag-history)
-           ("C-c t r" . ggtags-find-reference)
-           ("C-c t f" . ggtags-find-file)
-           ("C-c t c" . ggtags-create-tags))
-    :config
-    (progn
-      (setq ggtags-update-on-save nil) ;Don't try to update GTAGS on each save; makes the system sluggish for huge projects.
-      (setq ggtags-highlight-tag nil)  ;Don't auto-highlight tag at point.. makes the system really sluggish!
-      (setq ggtags-sort-by-nearness t) ; Enabling nearness requires global 6.5+
-      (setq ggtags-navigation-mode-lighter nil)
-      (setq ggtags-mode-line-project-name nil)
-      (setq ggtags-oversize-limit (* 30 1024 1024))) ; 30 MB
-
-    :init
-    (add-hook 'c-mode-common-hook
-              #'(lambda ()
-                  (when (derived-mode-p 'c-mode)
-                    (ggtags-mode 1))))))
-;; cc-mode
-(use-package cc-mode
-  :commands (cc-mode)
-  :config
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (c-set-offset 'inextern-lang 0)
-              (setq-local c-default-style "K&R")
-              (setq-local indent-tabs-mode nil)
-              (setq-local tab-width 4)
-              (setq-local c-basic-offset 4)))
-  (list c-mode-map c++-mode-map))
 
 ;; gdb
 (setq
@@ -988,53 +938,3 @@ This command does the inverse of `fill-paragraph'."
 ;;   (dashboard-setup-startup-hook))
 
 ;; --- end of .init.el file ---;
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#282a36" "#ff5555" "#50fa7b" "#f1fa8c" "#61bfff" "#ff79c6" "#8be9fd" "#f8f8f2"])
- '(custom-enabled-themes '(gruber-darker doom-solarized-dark))
- '(custom-safe-themes
-   '("d2098030ffc51462f4676c9a91f15e29833ee904a2608c83e87884965b73e5b7" "990e24b406787568c592db2b853aa65ecc2dcd08146c0d22293259d400174e37" "e6ff132edb1bfa0645e2ba032c44ce94a3bd3c15e3929cdf6c049802cf059a2a" "711efe8b1233f2cf52f338fd7f15ce11c836d0b6240a18fffffc2cbd5bfe61b0" "bf387180109d222aee6bb089db48ed38403a1e330c9ec69fe1f52460a8936b66" default))
- '(fci-rule-color "#6272a4")
- '(gdb-many-windows t t)
- '(jdee-db-active-breakpoint-face-colors (cons "#1E2029" "#bd93f9"))
- '(jdee-db-requested-breakpoint-face-colors (cons "#1E2029" "#50fa7b"))
- '(jdee-db-spec-breakpoint-face-colors (cons "#1E2029" "#565761"))
- '(objed-cursor-color "#ff5555")
- '(package-selected-packages
-   '(quelpa yasnippet yaml-mode xref-js2 which-key web-mode web use-package smex smartparens smart-comment restart-emacs rainbow-mode rainbow-delimiters persistent-scratch org-bullets olivetti mwim multiple-cursors move-text markdown-mode+ magit jsonnet-mode json-mode gitignore-mode git-timemachine git-messenger git-link git-gutter ggtags gcmh fountain-mode emmet-mode duplicate-thing doom-themes disk-usage diredfl dired-subtree dired-recent dired-narrow dired-git-info diminish deadgrep counsel-projectile charmap anzu all-the-icons-ivy-rich all-the-icons-ivy ace-window))
- '(pdf-view-midnight-colors (cons "#f8f8f2" "#282a36"))
- '(rustic-ansi-faces
-   ["#282a36" "#ff5555" "#50fa7b" "#f1fa8c" "#61bfff" "#ff79c6" "#8be9fd" "#f8f8f2"])
- '(vc-annotate-background "#282a36")
- '(vc-annotate-color-map
-   (list
-    (cons 20 "#50fa7b")
-    (cons 40 "#85fa80")
-    (cons 60 "#bbf986")
-    (cons 80 "#f1fa8c")
-    (cons 100 "#f5e381")
-    (cons 120 "#face76")
-    (cons 140 "#ffb86c")
-    (cons 160 "#ffa38a")
-    (cons 180 "#ff8ea8")
-    (cons 200 "#ff79c6")
-    (cons 220 "#ff6da0")
-    (cons 240 "#ff617a")
-    (cons 260 "#ff5555")
-    (cons 280 "#d45558")
-    (cons 300 "#aa565a")
-    (cons 320 "#80565d")
-    (cons 340 "#6272a4")
-    (cons 360 "#6272a4")))
- '(vc-annotate-very-old-color nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(web-mode-current-element-highlight-face ((nil (:background "#073642"))))
- '(web-mode-html-tag-bracket-face ((nil (:foreground "Snow3")))))
