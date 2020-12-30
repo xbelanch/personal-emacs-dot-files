@@ -526,8 +526,36 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 (use-package charmap)
 
+;; Ido
+(use-package smex)
+(use-package ido-completing-read+)
+(ido-mode 1)
+(ido-everywhere 1)
+(ido-ubiquitous-mode 1)
+
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+
 
 ;; Helm
+(use-package helm)
+(use-package helm-cmd-t)
+(use-package helm-git-grep)
+(use-package helm-ls-git)
+(use-package helm-ag)
+
+(setq helm-ff-transformer-show-only-basename nil)
+
+(global-set-key (kbd "C-c h t") 'helm-cmd-t)
+(global-set-key (kbd "C-c h g g") 'helm-git-grep)
+(global-set-key (kbd "C-c h g l") 'helm-ls-git-ls)
+(global-set-key (kbd "C-c h f") 'helm-find)
+(global-set-key (kbd "C-c h r") 'helm-recentf)
+(global-set-key (kbd "C-c h a") 'helm-ag)
+
+(use-package swiper-helm
+  :ensure t
+  :bind ("C-s" . swiper-helm))
 
 (use-package projectile
   :ensure t
