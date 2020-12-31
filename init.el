@@ -561,10 +561,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (global-set-key (kbd "C-c h r") 'helm-recentf)
 (global-set-key (kbd "C-c h a") 'helm-ag)
 
-(use-package swiper-helm
-  :ensure t
-  :bind ("C-s" . swiper-helm))
-
 (use-package projectile
   :ensure t
   :init
@@ -682,6 +678,19 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
   (yas-reload-all t))
 
+;; cc-mode
+(use-package cc-mode
+  :commands (cc-mode)
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (c-set-offset 'inextern-lang 0)
+              (setq-local c-default-style "K&R")
+              (setq-local indent-tabs-mode nil)
+              (setq-local tab-width 4)
+              (setq-local c-basic-offset 4)))
+  (list c-mode-map c++-mode-map))
+
 ;; gdb
 (setq
  ;; use gdb-many-windows by default
@@ -690,24 +699,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
  ;; Non-nil means display source file containing the main routine at startup
  gdb-show-main t
  )
-
-(defvar all-gud-modes
-  '(gud-mode comint-mode gdb-locals-mode gdb-frames-mode  gdb-breakpoints-mode)
-  "A list of modes when using gdb")
-(defun kill-all-gud-buffers ()
-  "Kill all gud buffers including Debugger, Locals, Frames, Breakpoints.
-Do this after `q` in Debugger buffer."
-  (interactive)
-  (save-excursion
-        (let ((count 0))
-          (dolist (buffer (buffer-list))
-                (set-buffer buffer)
-                (when (member major-mode all-gud-modes)
-                  (setq count (1+ count))
-                  (kill-buffer buffer)
-                  (delete-other-windows))) ;; fix the remaining two windows issue
-          (message "Killed %i buffer(s)." count))))
-
 
 ;; web-mode
 (use-package web-mode
