@@ -468,8 +468,8 @@ If you experience freezing, decrease this. If you experience stuttering, increas
                                         ;--- IT'S MAGIT ---;
                                         ;------------------;
 
-;; (use-package git-commit
-;;   :hook (after-init . global-git-commit-mode))
+(use-package git-commit
+  :hook (after-init . global-git-commit-mode))
 
 ;; The mode-line information isn’t always up-to-date
 ;; src: https://magit.vc/manual/magit/The-mode_002dline-information-isn_0027t-always-up_002dto_002ddate.html
@@ -495,11 +495,11 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 (use-package gitignore-mode)
 
-;; (use-package git-link)
+(use-package git-link)
 
-;; (use-package git-messenger)
+(use-package git-messenger)
 
-;; (use-package git-timemachine)
+(use-package git-timemachine)
 
 (use-package magit
   :bind ("C-x g" . magit-status))
@@ -719,7 +719,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :after (web-mode)
   :hook (web-mode . emmet-mode))
 
-
 (use-package js2-mode
   :init
   (setq js-indent-level 2)
@@ -744,6 +743,29 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   :mode (("\\.yml$" .  yaml-mode)
          ("\\.yaml$" . yaml-mode))
   :bind (("C-m" . newline-and-indent)))
+
+;; C# - Unity
+;; https://gist.github.com/kurogomapurin/42386006f9aaa7187840
+;; https://joshwolfe.ca/post/emacs-for-csharp/
+;; Compile https://stackoverflow.com/questions/6319274/how-do-i-run-msbuild-from-the-command-line-using-windows-sdk-7-1
+
+;; Finalment, la millor opció és fer servir el omnisharp-server-install
+;; en el moment de fer l'start ens demanarà el root (on tinguem l'sln.)
+(use-package csharp-mode)
+
+(if (eq system-type 'windows-nt)
+  (use-package omnisharp
+    :after company
+    :config
+    (add-hook 'csharp-mode-hook 'omnisharp-mode)
+    (add-to-list 'company-backends 'company-omnisharp)))
+
+
+;;; Programming languages packages that don't require any configuration
+(use-package glsl-mode)
+(use-package lua-mode)
+(use-package graphviz-dot-mode)
+(use-package haxe-mode)
 
 ;;                                         ;--------------------;
 ;;                                         ;--- Localization ---;
