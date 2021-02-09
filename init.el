@@ -155,7 +155,8 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (setq inhibit-startup-message t)
 
 ;; Show me errors
-(setq debug-on-error t)
+;; set true if you want to display whole error stuff
+(setq debug-on-error nil)
 
 ;; Show me more log messages
 (setq message-log-max 500)
@@ -293,6 +294,7 @@ If you experience freezing, decrease this. If you experience stuttering, increas
                                         ;-----------------------;
                                         ;--- Fonts and Icons ---;
                                         ;-----------------------;
+
 
 (add-hook 'after-init-hook
           (lambda ()
@@ -551,13 +553,28 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (use-package helm-git-grep)
 (use-package helm-ls-git)
 (use-package helm-ag)
+(use-package helm-projectile)
+
+(setq helm-split-window-in-side-p t)
+
+(add-to-list 'display-buffer-alist
+             '("\\`\\*helm.*\\*\\'"
+               (display-buffer-in-side-window)
+               (inhibit-same-window . t)
+               (window-height . 0.33)))
+
+(setq helm-swoop-split-with-multiple-windows nil
+        helm-swoop-split-direction 'split-window-vertically
+        helm-swoop-split-window-function 'helm-default-display-buffer)
 
 (setq helm-ff-transformer-show-only-basename nil)
+(setq helm-ff-skip-boring-files t)
 
+(global-set-key (kbd "C-x f") 'helm-for-files)
+(global-set-key (kbd "C-c h f") 'helm-find-files)
 (global-set-key (kbd "C-c h t") 'helm-cmd-t)
 (global-set-key (kbd "C-c h g g") 'helm-git-grep)
 (global-set-key (kbd "C-c h g l") 'helm-ls-git-ls)
-(global-set-key (kbd "C-c h f") 'helm-find)
 (global-set-key (kbd "C-c h r") 'helm-recentf)
 (global-set-key (kbd "C-c h a") 'helm-ag)
 
@@ -567,7 +584,8 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   (projectile-mode +1)
   :bind (:map projectile-mode-map
               ("s-p" . projectile-command-map)
-              ("C-c p" . projectile-command-map)))
+              ("C-c p" . projectile-command-map))
+  :config (setq-default projectile-enable-caching nil))
 
 (use-package counsel-projectile
   :after (counsel projectile)
@@ -649,6 +667,7 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;;                                         ;-------------------;
 ;;                                         ;--- Programming ---;
 ;;                                         ;-------------------;
+(setq compile-command "make -B")
 (setq compilation-scroll-output t)
 (setq compilation-window-height 20)
 
