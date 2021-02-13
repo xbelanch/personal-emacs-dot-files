@@ -235,7 +235,6 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   (setq locale-coding-system   'utf-8)
   (setq-default buffer-file-coding-system 'utf-8))
 
-
                                         ;--------------------;
                                         ;--- GUI / Window ---;
                                         ;--------------------;
@@ -301,15 +300,13 @@ If you experience freezing, decrease this. If you experience stuttering, increas
                                         ;--- Fonts and Icons ---;
                                         ;-----------------------;
 
+;; Grabbed from @tsoding: https://github.com/rexim/dotfiles/blob/e5db0dec316c24197c4c3fd32140f467584fa7b3/.emacs
+(defun my/get-default-font ()
+  (cond
+   ((eq system-type 'windows-nt) "Fantasque Sans Mono-14")
+   ((eq system-type 'gnu/linux) "Ubuntu Mono-20")))
 
-(add-hook 'after-init-hook
-          (lambda ()
-            (when (member "Fantasque Sans Mono" (font-family-list))
-            ;; (when (member "Ubuntu Mono" (font-family-list))
-              (set-face-attribute 'default nil :font "Fantasque Sans Mono")
-              ;; (set-face-attribute 'default nil :font "Ubuntu Mono-18")
-              (set-face-attribute 'default nil :height 140)
-              (set-face-attribute 'default nil :weight 'normal))))
+(add-to-list 'default-frame-alist `(font . ,(my/get-default-font)))
 
 
 (use-package all-the-icons
