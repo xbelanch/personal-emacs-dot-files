@@ -101,6 +101,11 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 
 ;; Add Melpa package list
 
+;;; Fix SSL TLS issue when emacs version is under 26.3
+(when (and (>= libgnutls-version 30603)
+           (version<= (number-to-string emacs-major-version) "26.2"))
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+
 (require 'package)
 
 (setq package-archives '())
