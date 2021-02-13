@@ -230,7 +230,8 @@ If you experience freezing, decrease this. If you experience stuttering, increas
   (set-keyboard-coding-system  'utf-8)
   (set-selection-coding-system 'utf-8)
   ;; src: https://stackoverflow.com/questions/22647517/emacs-encoding-of-pasted-text
-  (set-clipboard-coding-system 'utf-16le-dos)
+  (if (eq system-type 'windows-nt)
+      (set-clipboard-coding-system 'utf-16le-dos))
   (setq locale-coding-system   'utf-8)
   (setq-default buffer-file-coding-system 'utf-8))
 
