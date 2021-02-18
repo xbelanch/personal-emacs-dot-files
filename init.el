@@ -138,10 +138,10 @@ If you experience freezing, decrease this. If you experience stuttering, increas
       use-package-compute-statistics t)
 
 ;; Use the garbage collector magic hack
-(use-package gcmh
-  :ensure t
-  :init
-  (gcmh-mode 1))
+;; (use-package gcmh
+;;   :ensure t
+;;   :init
+;;   (gcmh-mode 1))
 
 ;; Allow some things that emacs would otherwise confirm.
 (put 'eval-expression  'disabled nil)
