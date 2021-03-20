@@ -304,7 +304,7 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 (defun my/get-default-font ()
   (cond
    ((eq system-type 'windows-nt) "Fantasque Sans Mono-14")
-   ((eq system-type 'gnu/linux) "Ubuntu Mono-20")))
+   ((eq system-type 'gnu/linux) "Ubuntu Mono-16")))
 
 (add-to-list 'default-frame-alist `(font . ,(my/get-default-font)))
 
@@ -670,9 +670,13 @@ If you experience freezing, decrease this. If you experience stuttering, increas
 ;;                                         ;-------------------;
 ;;                                         ;--- Programming ---;
 ;;                                         ;-------------------;
+
+
+
 (setq compile-command "make -B")
 (setq compilation-scroll-output t)
 (setq compilation-window-height 20)
+(set-frame-parameter nil 'unsplittable t) ;; prevent window split in a single frame
 
 (use-package smartparens-config
   :ensure smartparens
